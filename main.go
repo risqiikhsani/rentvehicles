@@ -33,6 +33,7 @@ func main() {
 	public := r.Group("/api")
 
 	routes.SetupUserRoutes(public)
+	routes.SetupAccountRoutes(public)
 
 	public.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

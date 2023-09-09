@@ -6,10 +6,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"uniqueIndex"`
-	Email    string `gorm:"uniqueIndex"`
-	Name     string
-	Phone    int32
+	PublicUsername string `gorm:"uniqueIndex" json:"publicUsername" binding:"required"`
+	Name           string `json:"name"`
+	Phone          int32  `json:"phone"`
+	About          string `json:"about"`
+	Gender         string `json:"gender"`
+	AccountID      uint
 
 	// Other fields
 }

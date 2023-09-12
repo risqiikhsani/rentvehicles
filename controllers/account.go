@@ -105,8 +105,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// get user data
+	var existingUser models.User
+	if err := models.DB.Where("account_id = ?", existingAccount.ID).First(&existingUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User data not found"})
+		return
+	}
+
 	// Generate and return a JWT token on successful login
-	token, err := utils.GenerateJWTToken(input.Username)
+	token, err := utils.GenerateJWTToken(existingUser.ID, existingUser.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return

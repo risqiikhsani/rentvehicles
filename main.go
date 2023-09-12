@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+
 	viper.AddConfigPath("./configs")
 	viper.SetConfigName("config") // Register config file name (no extension)
 	viper.SetConfigType("yaml")   // Look for specific type

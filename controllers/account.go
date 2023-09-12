@@ -9,6 +9,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// type UpdateInput struct {
+// 	Email     string `json:"email"`
+// 	Password  string `json:"password"`
+// }
+
+// func Update(c *gin.Context){
+// 	var input UpdateInput
+
+// 	if err := c.ShouldBindJSON(&input); err != nil {
+// 		c.JSON(400,gin.H{"error":err.Error()})
+// 		return
+// 	}
+
+// }
+
 type RegisterInput struct {
 	Username  string `json:"username" binding:"required"`
 	Email     string `json:"email" binding:"required,email"`

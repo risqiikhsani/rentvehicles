@@ -1,0 +1,10 @@
+development:
+  debug_mode: true
+
+production:
+  debug_mode: false
+
+server_port: 8080
+log_file: /log/gin.log
+feature_enabled: true
+max_items_per_page: 50

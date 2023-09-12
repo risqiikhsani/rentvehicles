@@ -10,9 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/contactgo/models"
 	"github.com/risqiikhsani/contactgo/routes"
+	"github.com/spf13/viper"
 )
 
 func main() {
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config") // Register config file name (no extension)
+	viper.SetConfigType("yaml")   // Look for specific type
+	viper.ReadInConfig()
+	// Read the configuration file
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+	serverPort := viper.GetString("server_port")
+
 	// Force log's color
 	// gin.ForceConsoleColor()
 
@@ -20,7 +31,7 @@ func main() {
 	gin.DisableConsoleColor()
 
 	// Logging to a file.
-	f, _ := os.Create("gin.log")
+	f, _ := os.Create(viper.GetString("log_file"))
 	//gin.DefaultWriter = io.MultiWriter(f)
 
 	// Use the following code if you need to write the logs to file and console at the same time.
@@ -70,5 +81,6 @@ func main() {
 		fmt.Printf("id: %s;title:%s;text:%s", id, title, text)
 	})
 
-	r.Run(":8080") // listen and serve on 0.0.0.0:8080
+	addr := fmt.Sprintf(":%s", serverPort)
+	r.Run(addr)
 }

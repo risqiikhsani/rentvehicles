@@ -4,31 +4,23 @@
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
-[GIN-debug] GET    /api/users                --> github.com/risqiikhsani/contactgo/controllers.GetUsers (4 handlers)
-[GIN-debug] GET    /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.GetUserById (4 handlers)
-[GIN-debug] PUT    /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.UpdateUserById (4 handlers)
-[GIN-debug] DELETE /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.DeleteUserById (4 handlers)
-[GIN-debug] POST   /api/users                --> github.com/risqiikhsani/contactgo/controllers.CreateUser (4 handlers)
-[GIN-debug] POST   /api/register             --> github.com/risqiikhsani/contactgo/controllers.Register (3 handlers)
-[GIN-debug] POST   /api/login                --> github.com/risqiikhsani/contactgo/controllers.Login (3 handlers)
-[GIN-debug] GET    /api/posts                --> github.com/risqiikhsani/contactgo/controllers.GetPosts (4 handlers)
-[GIN-debug] GET    /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.GetPostById (4 handlers)
-[GIN-debug] PUT    /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.UpdatePostById (4 handlers)
-[GIN-debug] DELETE /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.DeletePostById (4 handlers)
-[GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/contactgo/controllers.CreatePost (4 handlers)
-[GIN-debug] GET    /api/ping                 --> main.main.func1 (3 handlers)
-[GIN-debug] GET    /api/long_async           --> main.main.func2 (3 handlers)
-[GIN-debug] GET    /api/long_sync            --> main.main.func3 (3 handlers)
-[GIN-debug] POST   /api/post                 --> main.main.func4 (3 handlers)
+[GIN-debug] GET    /api/users                --> github.com/risqiikhsani/contactgo/controllers.GetUsers (5 handlers)
+[GIN-debug] GET    /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.GetUserById (5 handlers)
+[GIN-debug] PUT    /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.UpdateUserById (5 handlers)
+[GIN-debug] DELETE /api/users/:id            --> github.com/risqiikhsani/contactgo/controllers.DeleteUserById (5 handlers)
+[GIN-debug] POST   /api/users                --> github.com/risqiikhsani/contactgo/controllers.CreateUser (5 handlers)
+[GIN-debug] POST   /api/register             --> github.com/risqiikhsani/contactgo/controllers.Register (4 handlers)
+[GIN-debug] POST   /api/login                --> github.com/risqiikhsani/contactgo/controllers.Login (4 handlers)
+[GIN-debug] GET    /api/posts                --> github.com/risqiikhsani/contactgo/controllers.GetPosts (5 handlers)
+[GIN-debug] GET    /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.GetPostById (5 handlers)
+[GIN-debug] PUT    /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.UpdatePostById (5 handlers)
+[GIN-debug] DELETE /api/posts/:id            --> github.com/risqiikhsani/contactgo/controllers.DeletePostById (5 handlers)
+[GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/contactgo/controllers.CreatePost (5 handlers)
+[GIN-debug] GET    /api/ping                 --> main.main.func1 (4 handlers)
+[GIN-debug] GET    /api/long_async           --> main.main.func2 (4 handlers)
+[GIN-debug] GET    /api/long_sync            --> main.main.func3 (4 handlers)
+[GIN-debug] POST   /api/post                 --> main.main.func4 (4 handlers)
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/09/14 - 12:51:16 | 200 |    1.807671ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/09/14 - 12:51:58 | 201 |   10.090061ms |             ::1 | POST     "/api/posts"
-[GIN] 2023/09/14 - 12:52:04 | 200 |    1.496899ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/09/14 - 12:52:20 | 401 |      27.983µs |             ::1 | POST     "/api/posts"
-[GIN] 2023/09/14 - 12:52:42 | 201 |     9.00669ms |             ::1 | POST     "/api/posts"
-[GIN] 2023/09/14 - 12:52:45 | 200 |    1.714379ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/09/14 - 12:52:53 | 201 |   13.855404ms |             ::1 | POST     "/api/posts"
-[GIN] 2023/09/14 - 12:53:20 | 204 |   13.872058ms |             ::1 | DELETE   "/api/posts/2"
-[GIN] 2023/09/14 - 12:53:27 | 200 |    1.480555ms |             ::1 | GET      "/api/posts"
+[GIN] 2023/09/14 - 16:08:28 | 200 |    6.764108ms |             ::1 | GET      "/api/posts"

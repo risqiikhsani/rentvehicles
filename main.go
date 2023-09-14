@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/contactgo/middlewares"
 	"github.com/risqiikhsani/contactgo/models"
 	"github.com/risqiikhsani/contactgo/routes"
 	"github.com/spf13/viper"
@@ -43,7 +44,7 @@ func main() {
 	models.ConnectDB()
 
 	public := r.Group("/api")
-
+	public.Use(middlewares.LogMiddleware())
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)

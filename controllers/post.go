@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/contactgo/models"
 )
@@ -8,7 +11,10 @@ import (
 // Implement other route handlers similarly
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
-	models.DB.Find(&posts)
+	// Find all posts
+	// models.DB.Find(&posts)
+	// Find all posts and preload their associated images
+	models.DB.Preload("Images").Find(&posts)
 	c.JSON(200, posts)
 }
 
@@ -18,7 +24,9 @@ func GetPostById(c *gin.Context) {
 	var post models.Post
 
 	// Find the post by ID
-	result := models.DB.First(&post, postId)
+	// result := models.DB.First(&post, postId)
+	// Find the post by ID and preload its associated images
+	result := models.DB.Preload("Images").First(&post, postId)
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
@@ -100,17 +108,64 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	userId := userIDValue.(uint)
+	userID := userIDValue.(uint)
 
-	if err := c.BindJSON(&post); err != nil {
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Set the post's user ID to the authenticated user
-	post.UserID = userId
+	// Retrieve the text field from the form data
+	post.Text = c.PostForm("text")
 
-	models.DB.Create(&post)
+	// Set the post's user ID to the authenticated user
+	post.UserID = userID
+
+	// Create the post in the database
+	if err := models.DB.Create(&post).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create post"})
+		return
+	}
+
+	// Handle file uploads
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	files := form.File["files"]
+
+	for _, fileHeader := range files {
+		fmt.Println("there is files")
+		// Get the file name and path
+		filename := filepath.Base(fileHeader.Filename)
+		fmt.Println(filename)
+		filePath := filepath.Join("static/images", filename)
+		fmt.Println(filePath)
+
+		// Save the uploaded file to the specified path
+		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Assuming you want to store the file paths in the database,
+		// you can create an Image model and store the filePath in it.
+		// Here's a simplified example:
+
+		image := models.Image{
+			Path:   filePath,
+			PostID: post.ID, // Link the image to the post
+		}
+
+		if err := models.DB.Create(&image).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Failed to create image record"})
+			return
+		}
+	}
 
 	c.JSON(201, post)
 }

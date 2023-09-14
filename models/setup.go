@@ -40,6 +40,7 @@ func ConnectDB() {
 	// Perform database operations here
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Account{})
+	db.AutoMigrate(&Post{})
 
 	fmt.Println("Connected to PostgreSQL database")
 

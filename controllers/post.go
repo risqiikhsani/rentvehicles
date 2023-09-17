@@ -1,10 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/contactgo/handlers"
@@ -86,56 +83,69 @@ func UpdatePostById(c *gin.Context) {
 	imageIDsToDelete := c.PostFormArray("delete_image_ids")
 
 	// Delete selected images from the database and file system
-	for _, imageIDToDelete := range imageIDsToDelete {
-		var imageToDelete models.Image
-		if err := models.DB.Where("id = ? AND post_id = ?", imageIDToDelete, existingPost.ID).First(&imageToDelete).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Image not found or does not belong to the post"})
-			return
-		}
-
-		// Remove the image file from the file system
-		if err := os.Remove(imageToDelete.Path); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image file"})
-			return
-		}
-
-		// Delete the image record from the database
-		if err := models.DB.Delete(&imageToDelete).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image record"})
+	if len(imageIDsToDelete) > 0 {
+		if err := handlers.DeleteImages(c, existingPost.ID, imageIDsToDelete); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete images"})
 			return
 		}
 	}
 
 	files := form.File["files"]
 
-	for _, fileHeader := range files {
-		fmt.Println("there is files")
-		// Get the file name and path
-		filename := filepath.Base(fileHeader.Filename)
-		fmt.Println(filename)
-		filePath := filepath.Join("static/images", filename)
-		fmt.Println(filePath)
-
-		// Save the uploaded file to the specified path
-		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return
-		}
-
-		// Assuming you want to store the file paths in the database,
-		// you can create an Image model and store the filePath in it.
-		// Here's a simplified example:
-
-		image := models.Image{
-			Path:   filePath,
-			PostID: existingPost.ID, // Link the image to the post
-		}
-
-		if err := models.DB.Create(&image).Error; err != nil {
-			c.JSON(500, gin.H{"error": "Failed to create image record"})
-			return
-		}
+	// Handle file uploads and create image records
+	if err := handlers.UploadImages(c, existingPost.ID, files); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
+
+	// // Delete selected images from the database and file system
+	// for _, imageIDToDelete := range imageIDsToDelete {
+	// 	var imageToDelete models.Image
+	// 	if err := models.DB.Where("id = ? AND post_id = ?", imageIDToDelete, existingPost.ID).First(&imageToDelete).Error; err != nil {
+	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Image not found or does not belong to the post"})
+	// 		return
+	// 	}
+
+	// 	// Remove the image file from the file system
+	// 	if err := os.Remove(imageToDelete.Path); err != nil {
+	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image file"})
+	// 		return
+	// 	}
+
+	// 	// Delete the image record from the database
+	// 	if err := models.DB.Delete(&imageToDelete).Error; err != nil {
+	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image record"})
+	// 		return
+	// 	}
+	// }
+
+	// files := form.File["files"]
+
+	// for _, fileHeader := range files {
+	// 	// Get the file name and path
+	// 	filename := filepath.Base(fileHeader.Filename)
+	// 	filePath := filepath.Join("static/images", filename)
+
+	// 	// Save the uploaded file to the specified path
+	// 	if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
+	// 		c.JSON(400, gin.H{"error": err.Error()})
+	// 		return
+	// 	}
+
+	// 	// Assuming you want to store the file paths in the database,
+	// 	// you can create an Image model and store the filePath in it.
+	// 	// Here's a simplified example:
+
+	// 	image := models.Image{
+	// 		Path:   filePath,
+	// 		PostID: existingPost.ID, // Link the image to the post
+	// 	}
+
+	// 	if err := models.DB.Create(&image).Error; err != nil {
+	// 		c.JSON(500, gin.H{"error": "Failed to create image record"})
+	// 		return
+	// 	}
+	// }
 
 	c.JSON(http.StatusOK, existingPost)
 }
@@ -175,35 +185,13 @@ func CreatePost(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
 	files := form.File["files"]
 
-	for _, fileHeader := range files {
-		fmt.Println("there is files")
-		// Get the file name and path
-		filename := filepath.Base(fileHeader.Filename)
-		fmt.Println(filename)
-		filePath := filepath.Join("static/images", filename)
-		fmt.Println(filePath)
-
-		// Save the uploaded file to the specified path
-		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return
-		}
-
-		// Assuming you want to store the file paths in the database,
-		// you can create an Image model and store the filePath in it.
-		// Here's a simplified example:
-
-		image := models.Image{
-			Path:   filePath,
-			PostID: post.ID, // Link the image to the post
-		}
-
-		if err := models.DB.Create(&image).Error; err != nil {
-			c.JSON(500, gin.H{"error": "Failed to create image record"})
-			return
-		}
+	// Handle file uploads and create image records
+	if err := handlers.UploadImages(c, post.ID, files); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(201, post)

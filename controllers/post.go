@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/contactgo/handlers"
 	"github.com/risqiikhsani/contactgo/models"
 )
 
@@ -39,13 +40,10 @@ func GetPostById(c *gin.Context) {
 
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
-	userIDValue, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+	userID, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
 		return
 	}
-
-	userID := userIDValue.(uint)
 
 	// Get the post ID from the URL parameters
 	postID := c.Param("id")
@@ -85,7 +83,6 @@ func UpdatePostById(c *gin.Context) {
 		return
 	}
 
-	files := form.File["files"]
 	imageIDsToDelete := c.PostFormArray("delete_image_ids")
 
 	// Delete selected images from the database and file system
@@ -109,26 +106,33 @@ func UpdatePostById(c *gin.Context) {
 		}
 	}
 
-	// Save new uploaded images
+	files := form.File["files"]
+
 	for _, fileHeader := range files {
+		fmt.Println("there is files")
 		// Get the file name and path
 		filename := filepath.Base(fileHeader.Filename)
+		fmt.Println(filename)
 		filePath := filepath.Join("static/images", filename)
+		fmt.Println(filePath)
 
 		// Save the uploaded file to the specified path
 		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Create an Image record and link it to the post
+		// Assuming you want to store the file paths in the database,
+		// you can create an Image model and store the filePath in it.
+		// Here's a simplified example:
+
 		image := models.Image{
 			Path:   filePath,
 			PostID: existingPost.ID, // Link the image to the post
 		}
 
 		if err := models.DB.Create(&image).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create image record"})
+			c.JSON(500, gin.H{"error": "Failed to create image record"})
 			return
 		}
 	}
@@ -136,46 +140,13 @@ func UpdatePostById(c *gin.Context) {
 	c.JSON(http.StatusOK, existingPost)
 }
 
-func DeletePostById(c *gin.Context) {
-	postId := c.Param("id")
-	userIDValue, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		c.Abort()
-		return
-	}
-
-	userId := userIDValue.(uint)
-
-	var post models.Post
-	result := models.DB.First(&post, postId)
-	if result.Error != nil {
-		c.JSON(404, gin.H{"error": "Post not found"})
-		return
-	}
-
-	if post.UserID != userId {
-		c.JSON(403, gin.H{"error": "Not authorized to delete this post"})
-		return
-	}
-
-	models.DB.Delete(&post)
-
-	c.JSON(204, nil)
-}
-
 func CreatePost(c *gin.Context) {
 
-	userIDValue, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		c.Abort()
+	// Check if the user is authenticated
+	userID, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
 		return
 	}
-
-	userID := userIDValue.(uint)
 
 	// Parse the multipart form data to handle file uploads
 	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
@@ -236,4 +207,30 @@ func CreatePost(c *gin.Context) {
 	}
 
 	c.JSON(201, post)
+}
+
+func DeletePostById(c *gin.Context) {
+
+	// Check if the user is authenticated
+	userID, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
+		return
+	}
+
+	postId := c.Param("id")
+	var post models.Post
+	result := models.DB.First(&post, postId)
+	if result.Error != nil {
+		c.JSON(404, gin.H{"error": "Post not found"})
+		return
+	}
+
+	if post.UserID != userID {
+		c.JSON(403, gin.H{"error": "Not authorized to delete this post"})
+		return
+	}
+
+	models.DB.Delete(&post)
+
+	c.JSON(204, nil)
 }

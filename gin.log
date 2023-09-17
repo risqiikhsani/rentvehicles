@@ -25,6 +25,7 @@
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/09/17 - 09:01:27 | 200 |      6.3491ms |             ::1 | GET      "/api/users"
-[GIN] 2023/09/17 - 09:01:31 | 200 |      25.691ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/09/17 - 09:01:36 | 200 |     37.1661ms |       127.0.0.1 | GET      "/static/images/amd.png"
+[GIN] 2023/09/17 - 11:03:23 | 200 |     46.2289ms |             ::1 | PUT      "/api/posts/4"
+[GIN] 2023/09/17 - 11:03:27 | 200 |     15.7209ms |             ::1 | GET      "/api/posts/4"
+[GIN] 2023/09/17 - 11:03:46 | 200 |     48.8493ms |             ::1 | PUT      "/api/posts/4"
+[GIN] 2023/09/17 - 11:03:49 | 200 |     24.8203ms |             ::1 | GET      "/api/posts/4"

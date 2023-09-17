@@ -63,15 +63,15 @@ func UpdatePostById(c *gin.Context) {
 		return
 	}
 
-	// Parse the updated post data from the request body
-	var updatedPost models.Post
-	if err := c.BindJSON(&updatedPost); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Update the text of the post
-	existingPost.Text = updatedPost.Text
+	existingPost.Text = c.PostForm("text")
 
 	if err := models.DB.Save(&existingPost).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update post"})

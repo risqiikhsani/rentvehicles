@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -36,37 +38,102 @@ func GetPostById(c *gin.Context) {
 }
 
 func UpdatePostById(c *gin.Context) {
-	var post models.Post
-	postId := c.Param("id")
+	// Check if the user is authenticated
 	userIDValue, exists := c.Get("userID")
-
 	if !exists {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		c.Abort()
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	userId := userIDValue.(uint)
+	userID := userIDValue.(uint)
 
-	result := models.DB.First(&post, postId)
-	if result.Error != nil {
-		c.JSON(404, gin.H{"error": "Post not found"})
+	// Get the post ID from the URL parameters
+	postID := c.Param("id")
+
+	// Check if the post exists
+	var existingPost models.Post
+	if err := models.DB.Preload("Images").Where("id = ?", postID).First(&existingPost).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}
 
-	if post.UserID != userId {
-		c.JSON(403, gin.H{"error": "Not authorized to update this post"})
+	// Check if the user is the owner of the post
+	if existingPost.UserID != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this post"})
 		return
 	}
 
-	if err := c.ShouldBindJSON(&post); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+	// Parse the updated post data from the request body
+	var updatedPost models.Post
+	if err := c.BindJSON(&updatedPost); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	models.DB.Save(&post)
+	// Update the text of the post
+	existingPost.Text = updatedPost.Text
 
-	c.JSON(200, post)
+	if err := models.DB.Save(&existingPost).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update post"})
+		return
+	}
+
+	// Handle image uploads and deletions
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	files := form.File["files"]
+	imageIDsToDelete := c.PostFormArray("delete_image_ids")
+
+	// Delete selected images from the database and file system
+	for _, imageIDToDelete := range imageIDsToDelete {
+		var imageToDelete models.Image
+		if err := models.DB.Where("id = ? AND post_id = ?", imageIDToDelete, existingPost.ID).First(&imageToDelete).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Image not found or does not belong to the post"})
+			return
+		}
+
+		// Remove the image file from the file system
+		if err := os.Remove(imageToDelete.Path); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image file"})
+			return
+		}
+
+		// Delete the image record from the database
+		if err := models.DB.Delete(&imageToDelete).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image record"})
+			return
+		}
+	}
+
+	// Save new uploaded images
+	for _, fileHeader := range files {
+		// Get the file name and path
+		filename := filepath.Base(fileHeader.Filename)
+		filePath := filepath.Join("static/images", filename)
+
+		// Save the uploaded file to the specified path
+		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Create an Image record and link it to the post
+		image := models.Image{
+			Path:   filePath,
+			PostID: existingPost.ID, // Link the image to the post
+		}
+
+		if err := models.DB.Create(&image).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create image record"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, existingPost)
 }
 
 func DeletePostById(c *gin.Context) {
@@ -99,7 +166,7 @@ func DeletePostById(c *gin.Context) {
 }
 
 func CreatePost(c *gin.Context) {
-	var post models.Post
+
 	userIDValue, exists := c.Get("userID")
 
 	if !exists {
@@ -117,6 +184,7 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
+	var post models.Post
 	// Retrieve the text field from the form data
 	post.Text = c.PostForm("text")
 

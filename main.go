@@ -50,6 +50,7 @@ func main() {
 	// Use the following code if you need to write the logs to file and console at the same time.
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
+	// utils.InitializeValidator()
 	r := gin.Default()
 	static_path := viper.GetString("static_path")
 	r.Static("/static", "./"+static_path)

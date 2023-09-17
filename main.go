@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/risqiikhsani/contactgo/middlewares"
 	"github.com/risqiikhsani/contactgo/models"
 	"github.com/risqiikhsani/contactgo/routes"
@@ -26,6 +27,16 @@ func main() {
 	}
 	serverPort := viper.GetString("server_port")
 
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
+	baseURL := os.Getenv("BASE_URL")
+	static_image_path := viper.GetString("static_images_path")
+	models.SetBaseURL(baseURL)
+	models.SetStaticImagePath(static_image_path)
+
 	// Force log's color
 	// gin.ForceConsoleColor()
 
@@ -40,6 +51,8 @@ func main() {
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	r := gin.Default()
+	static_path := viper.GetString("static_path")
+	r.Static("/static", "./"+static_path)
 
 	models.ConnectDB()
 

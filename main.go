@@ -62,6 +62,7 @@ func main() {
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
+	routes.SetupCommentRoutes(public)
 
 	public.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

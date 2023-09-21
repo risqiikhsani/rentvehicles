@@ -19,7 +19,7 @@ func GetPosts(c *gin.Context) {
 }
 
 func GetPostById(c *gin.Context) {
-	postId := c.Param("id")
+	postId := c.Param("post_id")
 
 	var post models.Post
 
@@ -43,7 +43,7 @@ func UpdatePostById(c *gin.Context) {
 	}
 
 	// Get the post ID from the URL parameters
-	postID := c.Param("id")
+	postID := c.Param("post_id")
 
 	// Check if the post exists
 	var existingPost models.Post
@@ -205,7 +205,7 @@ func DeletePostById(c *gin.Context) {
 		return
 	}
 
-	postId := c.Param("id")
+	postId := c.Param("post_id")
 	var post models.Post
 	result := models.DB.First(&post, postId)
 	if result.Error != nil {

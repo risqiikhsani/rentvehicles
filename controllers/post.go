@@ -15,6 +15,7 @@ func GetPosts(c *gin.Context) {
 	// models.DB.Find(&posts)
 	// Find all posts and preload their associated images
 	models.DB.Preload("Images").Find(&posts)
+
 	c.JSON(200, posts)
 }
 

@@ -9,9 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/risqiikhsani/contactgo/middlewares"
-	"github.com/risqiikhsani/contactgo/models"
-	"github.com/risqiikhsani/contactgo/routes"
+	"github.com/risqiikhsani/rentvehicles/middlewares"
+	"github.com/risqiikhsani/rentvehicles/models"
+	"github.com/risqiikhsani/rentvehicles/routes"
 	"github.com/spf13/viper"
 )
 
@@ -62,7 +62,6 @@ func main() {
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
-	routes.SetupCommentRoutes(public)
 
 	public.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

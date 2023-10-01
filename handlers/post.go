@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/risqiikhsani/contactgo/models"
+	"github.com/risqiikhsani/rentvehicles/models"
 )
 
 func DeleteImages(c *gin.Context, postID uint, imageIDs []string) error {

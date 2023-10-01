@@ -10,10 +10,22 @@ import (
 
 type Post struct {
 	gorm.Model
-	Text     string  `json:"text" binding:"required"`
-	UserID   uint    // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
-	Images   []Image // One-to-many relationship with images
-	Comments []Comment
+	Brand         string  `json:"brand" binding:"required"`
+	BrandModel    string  `json:"brand_model" binding:"required"`
+	VehicleType   string  `json:"vehicle_type" binding:"required"`
+	Year          uint    `json:"year" binding:"required"`
+	Transmission  string  `json:"transmission" binding:"required"`
+	FuelType      string  `json:"fuel_type"`
+	PricePerDay   uint    `json:"price_per_day" binding:"required"`
+	PricePerWeek  uint    `json:"price_per_week" binding:"required"`
+	PricePerMonth uint    `json:"price_per_month" binding:"required"`
+	Discount      uint    `json:"discount"`
+	Units         uint    `json:"units" binding:"required"`
+	Available     bool    `json:"available" gorm:"default:true"`
+	UserID        uint    // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
+	Images        []Image // One-to-many relationship with images
+	LocationID    uint
+	Reviews       []Review
 	// Other fields
 }
 

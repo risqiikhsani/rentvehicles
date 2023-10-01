@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/risqiikhsani/contactgo/controllers"
-	"github.com/risqiikhsani/contactgo/middlewares"
+	"github.com/risqiikhsani/rentvehicles/controllers"
+	"github.com/risqiikhsani/rentvehicles/middlewares"
 )
 
 func SetupUserRoutes(public *gin.RouterGroup) {

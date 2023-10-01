@@ -1,4 +1,4 @@
-module github.com/risqiikhsani/contactgo
+module github.com/risqiikhsani/rentvehicles
 
 go 1.19
 

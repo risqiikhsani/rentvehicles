@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/risqiikhsani/contactgo/models"
+	"github.com/risqiikhsani/rentvehicles/models"
 )
 
 // Implement other route handlers similarly

@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/risqiikhsani/contactgo/controllers"
+	"github.com/risqiikhsani/rentvehicles/controllers"
 )
 
 func SetupAccountRoutes(public *gin.RouterGroup) {

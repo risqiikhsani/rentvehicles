@@ -4,12 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CheckAuthentication(c *gin.Context) (uint, bool) {
-	userIDValue, exists := c.Get("userID")
-	if !exists {
-		c.JSON(404, gin.H{"error": "Unauthorized"})
-		return 0, false
+func CheckAuthentication(c *gin.Context) (uint, string, bool) {
+	userIDValue, a := c.Get("userID")
+	userRoleValue, b := c.Get("userRole") // Assuming you store the user's role in "userRole"
+
+	if !a || !b {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return 0, "", false
 	}
+
 	userID := userIDValue.(uint)
-	return userID, true
+	userRole := userRoleValue.(string)
+
+	return userID, userRole, true
 }

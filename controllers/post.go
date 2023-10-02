@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
+	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
 // Implement other route handlers similarly
@@ -27,7 +28,7 @@ func GetPostById(c *gin.Context) {
 	// Find the post by ID
 	// result := models.DB.First(&post, postId)
 	// Find the post by ID and preload its associated images
-	result := models.DB.Preload("Images").First(&post, postId)
+	result := models.DB.Preload("Images").Preload("Reviews").First(&post, postId)
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
@@ -38,7 +39,7 @@ func GetPostById(c *gin.Context) {
 
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
 		return
 	}
@@ -67,7 +68,41 @@ func UpdatePostById(c *gin.Context) {
 	}
 
 	// Update the text of the post
-	existingPost.Text = c.PostForm("text")
+	existingPost.Brand = c.PostForm("brand")
+	existingPost.BrandModel = c.PostForm("brand_model")
+	existingPost.FuelType = c.PostForm("fuel_type")
+	existingPost.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	existingPost.Transmission = c.PostForm("transmission")
+	existingPost.Units, err = utils.ConvertToUint(c.PostForm("units"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	existingPost.VehicleType = c.PostForm("vehicle_type")
+	existingPost.Year, err = utils.ConvertToUint(c.PostForm("year"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	existingPost.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	existingPost.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	existingPost.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
 	if err := models.DB.Save(&existingPost).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update post"})
@@ -99,63 +134,18 @@ func UpdatePostById(c *gin.Context) {
 		return
 	}
 
-	// // Delete selected images from the database and file system
-	// for _, imageIDToDelete := range imageIDsToDelete {
-	// 	var imageToDelete models.Image
-	// 	if err := models.DB.Where("id = ? AND post_id = ?", imageIDToDelete, existingPost.ID).First(&imageToDelete).Error; err != nil {
-	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Image not found or does not belong to the post"})
-	// 		return
-	// 	}
-
-	// 	// Remove the image file from the file system
-	// 	if err := os.Remove(imageToDelete.Path); err != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image file"})
-	// 		return
-	// 	}
-
-	// 	// Delete the image record from the database
-	// 	if err := models.DB.Delete(&imageToDelete).Error; err != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image record"})
-	// 		return
-	// 	}
-	// }
-
-	// files := form.File["files"]
-
-	// for _, fileHeader := range files {
-	// 	// Get the file name and path
-	// 	filename := filepath.Base(fileHeader.Filename)
-	// 	filePath := filepath.Join("static/images", filename)
-
-	// 	// Save the uploaded file to the specified path
-	// 	if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
-	// 		c.JSON(400, gin.H{"error": err.Error()})
-	// 		return
-	// 	}
-
-	// 	// Assuming you want to store the file paths in the database,
-	// 	// you can create an Image model and store the filePath in it.
-	// 	// Here's a simplified example:
-
-	// 	image := models.Image{
-	// 		Path:   filePath,
-	// 		PostID: existingPost.ID, // Link the image to the post
-	// 	}
-
-	// 	if err := models.DB.Create(&image).Error; err != nil {
-	// 		c.JSON(500, gin.H{"error": "Failed to create image record"})
-	// 		return
-	// 	}
-	// }
-
 	c.JSON(http.StatusOK, existingPost)
 }
 
 func CreatePost(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
+		return
+	}
+
+	if userRole != "admin" {
 		return
 	}
 
@@ -167,8 +157,42 @@ func CreatePost(c *gin.Context) {
 	}
 
 	var post models.Post
-	// Retrieve the text field from the form data
-	post.Text = c.PostForm("text")
+	// Retrieve the text field from the form data)
+	post.Brand = c.PostForm("brand")
+	post.BrandModel = c.PostForm("brand_model")
+	post.FuelType = c.PostForm("fuel_type")
+	post.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.Transmission = c.PostForm("transmission")
+	post.Units, err = utils.ConvertToUint(c.PostForm("units"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.VehicleType = c.PostForm("vehicle_type")
+	post.Year, err = utils.ConvertToUint(c.PostForm("year"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Set the post's user ID to the authenticated user
 	post.UserID = userID
@@ -201,7 +225,7 @@ func CreatePost(c *gin.Context) {
 func DeletePostById(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
 		return
 	}

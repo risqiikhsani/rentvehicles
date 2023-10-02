@@ -11,4 +11,5 @@ type GoogleMapLocation struct {
 	Description string
 	Latitude    float64 `gorm:"not null"`
 	Longitude   float64 `gorm:"not null"`
+	UserID      uint
 }

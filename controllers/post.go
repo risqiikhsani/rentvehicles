@@ -37,6 +37,96 @@ func GetPostById(c *gin.Context) {
 	c.JSON(200, post)
 }
 
+func CreatePost(c *gin.Context) {
+
+	// Check if the user is authenticated
+	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
+		return
+	}
+
+	if userRole != "admin" {
+		return
+	}
+
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var post models.Post
+	// Retrieve the text field from the form data)
+	post.Brand = c.PostForm("brand")
+	post.BrandModel = c.PostForm("brand_model")
+	post.FuelType = c.PostForm("fuel_type")
+	post.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.Transmission = c.PostForm("transmission")
+	post.Units, err = utils.ConvertToUint(c.PostForm("units"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.VehicleType = c.PostForm("vehicle_type")
+	post.Year, err = utils.ConvertToUint(c.PostForm("year"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	post.Discount, err = utils.ConvertToUint(c.PostForm("discount"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Set the post's user ID to the authenticated user
+	post.UserID = userID
+
+	// Create the post in the database
+	if err := models.DB.Create(&post).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create post"})
+		return
+	}
+
+	// Handle file uploads
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	files := form.File["files"]
+
+	// Handle file uploads and create image records
+	if err := handlers.UploadImages(c, post.ID, files); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(201, post)
+}
+
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
 	userID, _, authenticated := handlers.CheckAuthentication(c)
@@ -103,6 +193,11 @@ func UpdatePostById(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+	existingPost.Discount, err = utils.ConvertToUint(c.PostForm("discount"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
 	if err := models.DB.Save(&existingPost).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update post"})
@@ -135,91 +230,6 @@ func UpdatePostById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, existingPost)
-}
-
-func CreatePost(c *gin.Context) {
-
-	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
-	if !authenticated {
-		return
-	}
-
-	if userRole != "admin" {
-		return
-	}
-
-	// Parse the multipart form data to handle file uploads
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	var post models.Post
-	// Retrieve the text field from the form data)
-	post.Brand = c.PostForm("brand")
-	post.BrandModel = c.PostForm("brand_model")
-	post.FuelType = c.PostForm("fuel_type")
-	post.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.Transmission = c.PostForm("transmission")
-	post.Units, err = utils.ConvertToUint(c.PostForm("units"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.VehicleType = c.PostForm("vehicle_type")
-	post.Year, err = utils.ConvertToUint(c.PostForm("year"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Set the post's user ID to the authenticated user
-	post.UserID = userID
-
-	// Create the post in the database
-	if err := models.DB.Create(&post).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to create post"})
-		return
-	}
-
-	// Handle file uploads
-
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-
-	files := form.File["files"]
-
-	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, post.ID, files); err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(201, post)
 }
 
 func DeletePostById(c *gin.Context) {

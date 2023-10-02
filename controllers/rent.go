@@ -50,6 +50,20 @@ func CreateRent(c *gin.Context) {
 	}
 
 	rent.UserID = userID
+
+	// Fetch the associated Post based on PostID
+	var post models.Post
+	if err := models.DB.First(&post, rent.PostID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Post not found"})
+		return
+	}
+
+	// Check if the associated Post is available
+	if !post.Available {
+		c.JSON(400, gin.H{"error": "Post is not available"})
+		return
+	}
+
 	// Create the rent in the database
 	if err := models.DB.Create(&rent).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to create comment"})

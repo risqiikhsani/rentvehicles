@@ -1,0 +1,27 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.GetUsers (5 handlers)
+[GIN-debug] GET    /api/users/:id            --> github.com/risqiikhsani/rentvehicles/controllers.GetUserById (5 handlers)
+[GIN-debug] PUT    /api/users/:id            --> github.com/risqiikhsani/rentvehicles/controllers.UpdateUserById (5 handlers)
+[GIN-debug] DELETE /api/users/:id            --> github.com/risqiikhsani/rentvehicles/controllers.DeleteUserById (5 handlers)
+[GIN-debug] POST   /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.CreateUser (5 handlers)
+[GIN-debug] POST   /api/register             --> github.com/risqiikhsani/rentvehicles/controllers.Register (4 handlers)
+[GIN-debug] POST   /api/login                --> github.com/risqiikhsani/rentvehicles/controllers.Login (4 handlers)
+[GIN-debug] GET    /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.GetPosts (5 handlers)
+[GIN-debug] GET    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetPostById (5 handlers)
+[GIN-debug] PUT    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdatePostById (5 handlers)
+[GIN-debug] DELETE /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeletePostById (5 handlers)
+[GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.CreatePost (5 handlers)
+[GIN-debug] GET    /api/ping                 --> main.main.func1 (4 handlers)
+[GIN-debug] GET    /api/long_async           --> main.main.func2 (4 handlers)
+[GIN-debug] GET    /api/long_sync            --> main.main.func3 (4 handlers)
+[GIN-debug] POST   /api/post                 --> main.main.func4 (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080

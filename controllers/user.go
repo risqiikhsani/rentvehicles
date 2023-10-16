@@ -13,7 +13,7 @@ func GetUsers(c *gin.Context) {
 }
 
 func GetUserById(c *gin.Context) {
-	userID := c.Param("id")
+	userID := c.Param("user_id")
 
 	var user models.User
 
@@ -29,7 +29,7 @@ func GetUserById(c *gin.Context) {
 
 func UpdateUserById(c *gin.Context) {
 	var user models.User
-	userId := c.Param("id")
+	userId := c.Param("user_id")
 
 	result := models.DB.First(&user, userId)
 	if result.Error != nil {
@@ -48,7 +48,7 @@ func UpdateUserById(c *gin.Context) {
 }
 
 func DeleteUserById(c *gin.Context) {
-	userId := c.Param("id")
+	userId := c.Param("user_id")
 
 	var user models.User
 	result := models.DB.First(&user, userId)

@@ -8,13 +8,13 @@ import (
 	"github.com/risqiikhsani/rentvehicles/models"
 )
 
-func getLocations(c *gin.Context) {
+func GetLocations(c *gin.Context) {
 	var locations []models.GoogleMapLocation
 	models.DB.Find(&locations)
 	c.JSON(200, locations)
 }
 
-func getLocationById(c *gin.Context) {
+func GetLocationById(c *gin.Context) {
 	locationId := c.Param("location_id")
 	var location models.GoogleMapLocation
 	result := models.DB.First(&location, locationId)
@@ -32,6 +32,7 @@ func CreateLocation(c *gin.Context) {
 	}
 
 	if userRole != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create location"})
 		return
 	}
 
@@ -60,13 +61,13 @@ func UpdateLocationById(c *gin.Context) {
 	locationId := c.Param("location_id")
 	var existingLocation models.GoogleMapLocation
 	if err := models.DB.Where("id = ?", locationId).First(&existingLocation).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "location not found"})
 		return
 	}
 
-	// Check if the user is the owner of the comment
+	// Check if the user is the owner of the location
 	if existingLocation.UserID != userID {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this comment"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this location"})
 		return
 	}
 
@@ -76,7 +77,7 @@ func UpdateLocationById(c *gin.Context) {
 	}
 
 	if err := models.DB.Save(&existingLocation).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update comment"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update location"})
 		return
 	}
 

@@ -187,8 +187,8 @@ func Login(c *gin.Context) {
 }
 
 type AccountUpdate struct {
-	Email                   string `json:"email" binding:"required"`
-	Password                string `json:"password" binding:"required"`
+	Email                   string `json:"email"`
+	Password                string `json:"password"`
 	Phone                   string `json:"phone"`
 	ValidateCurrentPassword string `json:"validate_current_password" binding:"required"`
 }
@@ -220,15 +220,24 @@ func UpdateAccount(c *gin.Context) {
 		return
 	}
 
-	if existingAccount.Password != accountUpdate.ValidateCurrentPassword {
-		c.JSON(404, gin.H{"error": "Current Password is wrong"})
+	if err := bcrypt.CompareHashAndPassword([]byte(existingAccount.Password), []byte(accountUpdate.ValidateCurrentPassword)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Current Password is wrong"})
 		return
 	}
 
 	// Copy the allowed fields from accountUpdate to existingAccount
-	existingAccount.Email = accountUpdate.Email
-	existingAccount.Password = accountUpdate.Password
-	existingAccount.Phone = accountUpdate.Phone
+	// Only update the fields if they are provided in the request
+	if accountUpdate.Email != "" {
+		existingAccount.Email = accountUpdate.Email
+	}
+
+	if accountUpdate.Password != "" {
+		existingAccount.Password = accountUpdate.Password
+	}
+
+	if accountUpdate.Phone != "" {
+		existingAccount.Phone = accountUpdate.Phone
+	}
 
 	models.DB.Save(&existingAccount)
 

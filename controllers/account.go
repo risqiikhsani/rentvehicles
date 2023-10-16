@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -76,7 +77,13 @@ func Register(c *gin.Context) {
 	}
 	models.DB.Create(&usr)
 
-	c.JSON(201, acc)
+	var existingUser models.User
+	if err := models.DB.Where("account_id = ?", acc.ID).First(&existingUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User data not found"})
+		return
+	}
+
+	c.JSON(201, existingUser)
 }
 
 func RegisterAdmin(c *gin.Context) {
@@ -125,7 +132,13 @@ func RegisterAdmin(c *gin.Context) {
 	}
 	models.DB.Create(&usr)
 
-	c.JSON(201, acc)
+	var existingUser models.User
+	if err := models.DB.Where("account_id = ?", acc.ID).First(&existingUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User data not found"})
+		return
+	}
+
+	c.JSON(201, existingUser)
 }
 
 type LoginInput struct {
@@ -134,6 +147,7 @@ type LoginInput struct {
 }
 
 func Login(c *gin.Context) {
+
 	var input LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -168,6 +182,78 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"token": token, "user": existingUser})
 
+}
+
+type AccountUpdate struct {
+	Email                   string `json:"email" binding:"required"`
+	Password                string `json:"password" binding:"required"`
+	Phone                   string `json:"phone"`
+	ValidateCurrentPassword string `json:"validate_current_password" binding:"required"`
+}
+
+func UpdateAccount(c *gin.Context) {
+	// Check if the user is authenticated
+	userID, _, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
+		return
+	}
+
+	var existingUser models.User
+	if err := models.DB.First(&existingUser, userID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	// check if account is owner's
+	var existingAccount models.Account
+	if err := models.DB.First(&existingAccount, existingUser.AccountID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Account not found"})
+		return
+	}
+
+	// Create a new instance of AccountUpdate and bind JSON data to it
+	var accountUpdate AccountUpdate
+	if err := c.ShouldBindJSON(&accountUpdate); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if existingAccount.Password != accountUpdate.ValidateCurrentPassword {
+		c.JSON(404, gin.H{"error": "Current Password is wrong"})
+		return
+	}
+
+	// Copy the allowed fields from accountUpdate to existingAccount
+	existingAccount.Email = accountUpdate.Email
+	existingAccount.Password = accountUpdate.Password
+	existingAccount.Phone = accountUpdate.Phone
+
+	models.DB.Save(&existingAccount)
+
+	c.JSON(200, existingAccount)
+}
+
+func GetAccount(c *gin.Context) {
+	// Check if the user is authenticated
+	userID, _, authenticated := handlers.CheckAuthentication(c)
+	if !authenticated {
+		return
+	}
+
+	var existingUser models.User
+	if err := models.DB.First(&existingUser, userID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	// check if account is owner's
+	var existingAccount models.Account
+	if err := models.DB.First(&existingAccount, existingUser.AccountID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Account not found"})
+		return
+	}
+
+	c.JSON(200, existingAccount)
 }

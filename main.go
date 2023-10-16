@@ -59,9 +59,23 @@ func main() {
 
 	public := r.Group("/api")
 	public.Use(middlewares.LogMiddleware())
+	routes.SetupPublicAccountRoutes(public)  // in front of auth middleware so it's not using auth middleware (jwt token not required)
+	public.Use(middlewares.AuthMiddleware()) // will apply to all routes below
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
+
+	public.GET("/cookie", func(c *gin.Context) {
+
+		cookie, err := c.Cookie("gin_cookie")
+
+		if err != nil {
+			cookie = "NotSet"
+			c.SetCookie("gin_cookie", "test", 3600, "/", "localhost", false, true)
+		}
+
+		fmt.Printf("Cookie value: %s \n", cookie)
+	})
 
 	public.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

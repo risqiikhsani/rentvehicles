@@ -46,6 +46,7 @@ func CreatePost(c *gin.Context) {
 	}
 
 	if userRole != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create post"})
 		return
 	}
 

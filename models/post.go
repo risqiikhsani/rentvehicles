@@ -15,7 +15,7 @@ type Post struct {
 	VehicleType   string  `json:"vehicle_type" binding:"required"`
 	Year          uint    `json:"year" binding:"required"`
 	Transmission  string  `json:"transmission" binding:"required"`
-	FuelType      string  `json:"fuel_type"`
+	FuelType      string  `json:"fuel_type" binding:"required"`
 	PricePerDay   uint    `json:"price_per_day" binding:"required"`
 	PricePerWeek  uint    `json:"price_per_week" binding:"required"`
 	PricePerMonth uint    `json:"price_per_month" binding:"required"`

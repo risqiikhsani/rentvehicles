@@ -10,10 +10,10 @@ func SetupLocationRoutes(public *gin.RouterGroup) {
 	locationGroup := public.Group("/locations")
 	locationGroup.Use(middlewares.AuthMiddleware())
 	{
-		locationGroup.GET("", controllers.GetLocations)
-		locationGroup.GET("/:location_id", controllers.GetLocationById)
-		locationGroup.PUT("/:location_id", controllers.UpdateLocationById)
-		locationGroup.DELETE("/:location_id", controllers.DeleteLocationById)
-		locationGroup.POST("", controllers.CreateLocation)
+		locationGroup.POST("", controllers.CreateLocation)                    // done test
+		locationGroup.GET("", controllers.GetLocations)                       // done test
+		locationGroup.GET("/:location_id", controllers.GetLocationById)       // done test
+		locationGroup.PUT("/:location_id", controllers.UpdateLocationById)    // done test
+		locationGroup.DELETE("/:location_id", controllers.DeleteLocationById) //done test
 	}
 }

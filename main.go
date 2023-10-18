@@ -64,6 +64,7 @@ func main() {
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
+	routes.SetupLocationRoutes(public)
 
 	public.GET("/cookie", func(c *gin.Context) {
 

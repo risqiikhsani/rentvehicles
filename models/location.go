@@ -9,8 +9,8 @@ type GoogleMapLocation struct {
 
 	Name        string `gorm:"not null" binding:"required"`
 	Description string
-	Address     string  `binding:"required"`
-	Latitude    float64 `gorm:"not null"`
-	Longitude   float64 `gorm:"not null"`
+	Address     string `gorm:"not null" binding:"required"`
+	Latitude    string
+	Longitude   string
 	UserID      uint
 }

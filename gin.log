@@ -21,6 +21,11 @@
 [GIN-debug] PUT    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdatePostById (6 handlers)
 [GIN-debug] DELETE /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeletePostById (6 handlers)
 [GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.CreatePost (6 handlers)
+[GIN-debug] POST   /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.CreateLocation (6 handlers)
+[GIN-debug] GET    /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.GetLocations (6 handlers)
+[GIN-debug] GET    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.GetLocationById (6 handlers)
+[GIN-debug] PUT    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.UpdateLocationById (6 handlers)
+[GIN-debug] DELETE /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.DeleteLocationById (6 handlers)
 [GIN-debug] GET    /api/cookie               --> main.main.func1 (5 handlers)
 [GIN-debug] GET    /api/ping                 --> main.main.func2 (5 handlers)
 [GIN-debug] GET    /api/long_async           --> main.main.func3 (5 handlers)
@@ -29,5 +34,3 @@
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/10/17 - 22:29:57 | 200 |    120.7555ms |             ::1 | POST     "/api/login"
-[GIN] 2023/10/17 - 22:49:34 | 200 |    139.1319ms |             ::1 | POST     "/api/login"

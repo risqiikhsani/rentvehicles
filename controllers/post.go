@@ -119,7 +119,7 @@ func CreatePost(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, post.ID, files); err != nil {
+	if err := handlers.UploadImages(c, &post.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -224,7 +224,7 @@ func UpdatePostById(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, existingPost.ID, files); err != nil {
+	if err := handlers.UploadImages(c, &existingPost.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

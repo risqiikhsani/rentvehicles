@@ -171,7 +171,7 @@ func UpdateRentById(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, existingRent.ID, files); err != nil {
+	if err := handlers.UploadImages(c, &existingRent.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

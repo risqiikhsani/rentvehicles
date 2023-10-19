@@ -30,7 +30,7 @@ func DeleteImages(c *gin.Context, postID uint, imageIDs []string) error {
 	return nil
 }
 
-func UploadImages(c *gin.Context, postID uint, files []*multipart.FileHeader) error {
+func UploadImages(c *gin.Context, postID *uint, files []*multipart.FileHeader) error {
 	// Check if the post with the provided postID exists
 	var post models.Post
 	if err := models.DB.First(&post, postID).Error; err != nil {

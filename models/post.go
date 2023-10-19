@@ -32,8 +32,8 @@ type Post struct {
 type Image struct {
 	gorm.Model
 	Path   string `json:"url"` // Store the image path
-	PostID uint   // Foreign key to associate the image with a post
-	RentID uint
+	PostID *uint  // Foreign key to associate the image with a post
+	RentID *uint
 }
 
 var baseURL string

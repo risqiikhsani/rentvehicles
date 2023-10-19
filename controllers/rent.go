@@ -162,7 +162,7 @@ func UpdateRentById(c *gin.Context) {
 
 	// Delete selected images from the database and file system
 	if len(imageIDsToDelete) > 0 {
-		if err := handlers.DeleteImages(c, existingRent.ID, imageIDsToDelete); err != nil {
+		if err := handlers.DeleteRentImages(c, existingRent.ID, imageIDsToDelete); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete images"})
 			return
 		}
@@ -171,7 +171,7 @@ func UpdateRentById(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, &existingRent.ID, files); err != nil {
+	if err := handlers.UploadRentImages(c, &existingRent.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

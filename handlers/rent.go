@@ -9,10 +9,10 @@ import (
 	"github.com/risqiikhsani/rentvehicles/models"
 )
 
-func DeletePostImages(c *gin.Context, postID uint, imageIDs []string) error {
+func DeleteRentImages(c *gin.Context, rentID uint, imageIDs []string) error {
 	for _, imageIDToDelete := range imageIDs {
 		var imageToDelete models.Image
-		if err := models.DB.Where("id = ? AND post_id = ?", imageIDToDelete, postID).First(&imageToDelete).Error; err != nil {
+		if err := models.DB.Where("id = ? AND rent_id = ?", imageIDToDelete, rentID).First(&imageToDelete).Error; err != nil {
 			return err
 		}
 
@@ -30,10 +30,10 @@ func DeletePostImages(c *gin.Context, postID uint, imageIDs []string) error {
 	return nil
 }
 
-func UploadPostImages(c *gin.Context, postID *uint, files []*multipart.FileHeader) error {
-	// Check if the post with the provided postID exists
+func UploadRentImages(c *gin.Context, rentID *uint, files []*multipart.FileHeader) error {
+	// Check if the post with the provided rentID exists
 	var post models.Post
-	if err := models.DB.First(&post, postID).Error; err != nil {
+	if err := models.DB.First(&post, rentID).Error; err != nil {
 		return err
 	}
 
@@ -53,7 +53,7 @@ func UploadPostImages(c *gin.Context, postID *uint, files []*multipart.FileHeade
 
 		image := models.Image{
 			Path:   filePath,
-			PostID: postID, // Link the image to the post
+			RentID: rentID, // Link the image to the post
 		}
 
 		if err := models.DB.Create(&image).Error; err != nil {

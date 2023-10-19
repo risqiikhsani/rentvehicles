@@ -119,7 +119,7 @@ func CreatePost(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, &post.ID, files); err != nil {
+	if err := handlers.UploadPostImages(c, &post.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -215,7 +215,7 @@ func UpdatePostById(c *gin.Context) {
 
 	// Delete selected images from the database and file system
 	if len(imageIDsToDelete) > 0 {
-		if err := handlers.DeleteImages(c, existingPost.ID, imageIDsToDelete); err != nil {
+		if err := handlers.DeletePostImages(c, existingPost.ID, imageIDsToDelete); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete images"})
 			return
 		}
@@ -224,7 +224,7 @@ func UpdatePostById(c *gin.Context) {
 	files := form.File["files"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadImages(c, &existingPost.ID, files); err != nil {
+	if err := handlers.UploadPostImages(c, &existingPost.ID, files); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

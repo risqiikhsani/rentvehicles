@@ -16,9 +16,9 @@ type Rent struct {
 	EndDate      time.Time
 	PickupDate   time.Time
 	ReturnDate   time.Time
-	LicensePlate string `json:"license_plate"`
-	Status       string `gorm:"default:'ReadyToPickup'" json:"status"`
-	Images       []Image
+	LicensePlate string  `json:"license_plate"`
+	Status       string  `gorm:"default:'ReadyToPickup'" json:"status"`
+	Images       []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Other fields
 }
 

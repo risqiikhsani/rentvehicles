@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -51,54 +52,47 @@ func CreatePost(c *gin.Context) {
 	}
 
 	// Parse the multipart form data to handle file uploads
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+
+	var post models.Post
+
+	if err := c.ShouldBind(&post); err != nil {
+		// Create a map to hold custom error messages
+		errors := make(map[string]string)
+
+		for _, fieldError := range err.(validator.ValidationErrors) {
+			// field := strings.ToLower(fieldError.Field()) // Convert to lowercase
+			field := fieldError.StructField()
+			tag := fieldError.Tag()
+
+			// Customize error messages based on the field and tag
+			switch {
+			case tag == "required":
+				errors[field] = field + " is required."
+			case tag == "min" && field == "year":
+				errors[field] = field + " must be at least X years old."
+			// Add more cases for other tags and fields
+			default:
+				errors[field] = field + " is invalid."
+			}
+		}
+
+		c.JSON(400, gin.H{"errors": errors})
 		return
 	}
 
-	var post models.Post
 	// Retrieve the text field from the form data)
-	post.Brand = c.PostForm("brand")
-	post.BrandModel = c.PostForm("brand_model")
-	post.FuelType = c.PostForm("fuel_type")
-	post.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.Transmission = c.PostForm("transmission")
-	post.Units, err = utils.ConvertToUint(c.PostForm("units"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.VehicleType = c.PostForm("vehicle_type")
-	post.Year, err = utils.ConvertToUint(c.PostForm("year"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	post.Discount, err = utils.ConvertToUint(c.PostForm("discount"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
+	// post.Brand = c.PostForm("brand")
+	// post.BrandModel = c.PostForm("brand_model")
+	// post.FuelType = c.PostForm("fuel_type")
+	// post.LocationID, _ = utils.ConvertToUint(c.PostForm("location_id"))
+	// post.Transmission = c.PostForm("transmission")
+	// post.Units, _ = utils.ConvertToUint(c.PostForm("units"))
+	// post.VehicleType = c.PostForm("vehicle_type")
+	// post.Year, _ = utils.ConvertToUint(c.PostForm("year"))
+	// post.PricePerDay, _ = utils.ConvertToUint(c.PostForm("price_per_day"))
+	// post.PricePerWeek, _ = utils.ConvertToUint(c.PostForm("price_per_week"))
+	// post.PricePerMonth, _ = utils.ConvertToUint(c.PostForm("price_per_month"))
+	// post.Discount, _ = utils.ConvertToUint(c.PostForm("discount"))
 
 	// Set the post's user ID to the authenticated user
 	post.UserID = userID
@@ -110,6 +104,11 @@ func CreatePost(c *gin.Context) {
 	}
 
 	// Handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
 	form, err := c.MultipartForm()
 	if err != nil {

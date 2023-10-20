@@ -14,6 +14,6 @@ func SetupPostRoutes(public *gin.RouterGroup) {
 		postGroup.GET("/:post_id", controllers.GetPostById)
 		postGroup.PUT("/:post_id", controllers.UpdatePostById)
 		postGroup.DELETE("/:post_id", controllers.DeletePostById)
-		postGroup.POST("", controllers.CreatePost)
+		postGroup.POST("", controllers.CreatePost) // done test
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
-	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
 // Implement other route handlers similarly
@@ -150,52 +149,9 @@ func UpdatePostById(c *gin.Context) {
 		return
 	}
 
-	// Parse the multipart form data to handle file uploads
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
 	// Update the text of the post
-	existingPost.Brand = c.PostForm("brand")
-	existingPost.BrandModel = c.PostForm("brand_model")
-	existingPost.FuelType = c.PostForm("fuel_type")
-	existingPost.LocationID, err = utils.ConvertToUint(c.PostForm("location_id"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.Transmission = c.PostForm("transmission")
-	existingPost.Units, err = utils.ConvertToUint(c.PostForm("units"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.VehicleType = c.PostForm("vehicle_type")
-	existingPost.Year, err = utils.ConvertToUint(c.PostForm("year"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.PricePerDay, err = utils.ConvertToUint(c.PostForm("price_per_day"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.PricePerWeek, err = utils.ConvertToUint(c.PostForm("price_per_week"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.PricePerMonth, err = utils.ConvertToUint(c.PostForm("price_per_month"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	existingPost.Discount, err = utils.ConvertToUint(c.PostForm("discount"))
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+	if err := c.ShouldBind(&existingPost); err != nil {
+		c.JSON(400, gin.H{"errors": err.Error()})
 		return
 	}
 
@@ -205,6 +161,14 @@ func UpdatePostById(c *gin.Context) {
 	}
 
 	// Handle image uploads and deletions
+
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
 	form, err := c.MultipartForm()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

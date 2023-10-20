@@ -2,7 +2,10 @@ package utils
 
 import (
 	"math/rand"
+	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // randomstring generates a random string
@@ -20,4 +23,10 @@ func RandomString() string {
 	}
 
 	return string(b)
+}
+
+func RandomStringUuid() string {
+	randomString := uuid.New().String()
+	timestamp := time.Now().UnixNano()
+	return randomString + "_" + strconv.FormatInt(timestamp, 10)
 }

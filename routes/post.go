@@ -10,10 +10,10 @@ func SetupPostRoutes(public *gin.RouterGroup) {
 	postGroup := public.Group("/posts")
 	postGroup.Use(middlewares.AuthMiddleware())
 	{
-		postGroup.GET("", controllers.GetPosts)
-		postGroup.GET("/:post_id", controllers.GetPostById)
-		postGroup.PUT("/:post_id", controllers.UpdatePostById)
-		postGroup.DELETE("/:post_id", controllers.DeletePostById)
-		postGroup.POST("", controllers.CreatePost) // done test
+		postGroup.GET("", controllers.GetPosts)                   // done test
+		postGroup.GET("/:post_id", controllers.GetPostById)       // done test
+		postGroup.PUT("/:post_id", controllers.UpdatePostById)    // done test
+		postGroup.DELETE("/:post_id", controllers.DeletePostById) // done test
+		postGroup.POST("", controllers.CreatePost)                // done test
 	}
 }

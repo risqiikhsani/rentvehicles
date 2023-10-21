@@ -12,6 +12,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
+	"github.com/risqiikhsani/rentvehicles/utils"
 	"github.com/spf13/viper"
 )
 
@@ -52,6 +53,10 @@ func main() {
 
 	// utils.InitializeValidator()
 	r := gin.Default()
+
+	utils.InitializeTranslator() // translator first , because initializeValidator needs it
+	utils.InitializeValidator()
+
 	static_path := viper.GetString("static_path")
 	r.Static("/static", "./"+static_path)
 
@@ -65,6 +70,7 @@ func main() {
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
 	routes.SetupLocationRoutes(public)
+	routes.SetupCatRoutes(public)
 
 	public.GET("/cookie", func(c *gin.Context) {
 

@@ -47,6 +47,7 @@ func ConnectDB() {
 	db.AutoMigrate(&GoogleMapLocation{})
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&Transaction{})
+	db.AutoMigrate(&Cat{}) // for testing purpose !!!
 
 	fmt.Println("Connected to PostgreSQL database")
 

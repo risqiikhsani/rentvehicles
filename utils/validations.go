@@ -1,8 +1,12 @@
 package utils
 
 import (
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
+
+var Validate *validator.Validate
 
 // Custom validation function for password
 func PasswordContainsAlphabetAndNumber(fl validator.FieldLevel) bool {
@@ -25,7 +29,22 @@ func PasswordContainsAlphabetAndNumber(fl validator.FieldLevel) bool {
 }
 
 func InitializeValidator() {
-	validate := validator.New()
+	Validate = validator.New(validator.WithRequiredStructEnabled())
 	// Register custom validation tags or rules here
-	validate.RegisterValidation("passwordContainsAlphabetAndNumber", PasswordContainsAlphabetAndNumber)
+	// Validate.RegisterValidation("passwordContainsAlphabetAndNumber", PasswordContainsAlphabetAndNumber)
+	_ = en_translations.RegisterDefaultTranslations(Validate, En)
+}
+
+func TranslateError(err error, trans ut.Translator) (errs []string) {
+	if err == nil {
+		return nil
+	}
+
+	validatorErrs := err.(validator.ValidationErrors)
+	for _, e := range validatorErrs {
+		translatedErr := e.Translate(trans)
+		errs = append(errs, translatedErr)
+	}
+
+	return errs
 }

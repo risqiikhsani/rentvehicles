@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/handlers"
@@ -118,33 +117,12 @@ func UpdateRentById(c *gin.Context) {
 		return
 	}
 
-	// Parse the multipart form data to handle file uploads
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
 	// Update the text of the rent
-	existingRent.Text = c.PostForm("text")
-	pickupDateStr := c.PostForm("pickup_date")
-	pickupDate, err := time.Parse("2006-01-02", pickupDateStr)
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+
+	if err := c.ShouldBind(&existingRent); err != nil {
+		c.JSON(400, gin.H{"errors": err.Error()})
 		return
-	} else {
-		existingRent.PickupDate = pickupDate
 	}
-	returnDateStr := c.PostForm("return_date")
-	returnDate, err := time.Parse("2006-01-02", returnDateStr)
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	} else {
-		existingRent.PickupDate = returnDate
-	}
-	existingRent.LicensePlate = c.PostForm("license_plate")
-	existingRent.Status = c.PostForm("status")
 
 	if err := models.DB.Save(&existingRent).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rent"})
@@ -152,6 +130,13 @@ func UpdateRentById(c *gin.Context) {
 	}
 
 	// Handle image uploads and deletions
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
 	form, err := c.MultipartForm()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

@@ -13,8 +13,10 @@ func SetupRentRoutes(public *gin.RouterGroup) {
 		rentGroup.GET("", controllers.GetPosts)
 		rentGroup.GET("/:rent_id", controllers.GetPostById)
 		rentGroup.PUT("/:rent_id", controllers.UpdatePostById)
-		// rentGroup.DELETE("/:rent_id", controllers.DeletePostById)	rents data intends to be not deleted , remains history, only can be cancelled
+		// rents data intends to be not deleted , remains history, only can be cancelled
+		// rentGroup.DELETE("/:rent_id", controllers.DeletePostById)
 		rentGroup.POST("", controllers.CreatePost)
-		rentGroup.POST("/:rent_id/cancel", nil) // if it's paid , can't cancel the rent ? or refundable rent
+		// if it's paid , can't cancel the rent ? or refundable rent
+		rentGroup.POST("/:rent_id/cancel", nil)
 	}
 }

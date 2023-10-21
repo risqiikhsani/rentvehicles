@@ -11,21 +11,21 @@ import (
 
 type Post struct {
 	gorm.Model
-	Brand         string  `json:"brand" form:"brand" binding:"required"`
-	BrandModel    string  `json:"brand_model" form:"brand_model" binding:"required"`
-	VehicleType   string  `json:"vehicle_type" form:"vehicle_type" binding:"required"`
-	Year          uint    `json:"year" form:"year" binding:"required"`
-	Transmission  string  `json:"transmission" form:"transmission" binding:"required"`
-	FuelType      string  `json:"fuel_type" form:"fuel_type" binding:"required"`
-	PricePerDay   uint    `json:"price_per_day" form:"price_per_day" binding:"required"`
-	PricePerWeek  uint    `json:"price_per_week" form:"price_per_week" binding:"required"`
-	PricePerMonth uint    `json:"price_per_month" form:"price_per_month" binding:"required"`
-	Discount      uint    `json:"discount" form:"discount"`
-	Units         uint    `json:"units" form:"units" binding:"required"`
-	Available     bool    `json:"available" form:"available" gorm:"default:true"`
-	UserID        uint    // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
-	Images        []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // One-to-many relationship with images
-	LocationID    uint
+	Brand         string   `json:"brand" form:"brand" binding:"required"`
+	BrandModel    string   `json:"brand_model" form:"brand_model" binding:"required"`
+	VehicleType   string   `json:"vehicle_type" form:"vehicle_type" binding:"required"`
+	Year          uint     `json:"year" form:"year" binding:"required"`
+	Transmission  string   `json:"transmission" form:"transmission" binding:"required"`
+	FuelType      string   `json:"fuel_type" form:"fuel_type" binding:"required"`
+	PricePerDay   uint     `json:"price_per_day" form:"price_per_day" binding:"required"`
+	PricePerWeek  uint     `json:"price_per_week" form:"price_per_week" binding:"required"`
+	PricePerMonth uint     `json:"price_per_month" form:"price_per_month" binding:"required"`
+	Discount      uint     `json:"discount" form:"discount"`
+	Units         uint     `json:"units" form:"units" binding:"required"`
+	Available     bool     `json:"available" form:"available" gorm:"default:true"`
+	UserID        uint     // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
+	Images        []Image  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // One-to-many relationship with images
+	LocationID    uint     `json:"location_id" form:"location_id" binding:"required"`
 	Reviews       []Review `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Other fields
 }

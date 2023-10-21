@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"gorm.io/gorm"
@@ -25,7 +26,7 @@ type Post struct {
 	UserID        uint    // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
 	Images        []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // One-to-many relationship with images
 	LocationID    uint
-	Reviews       []Review
+	Reviews       []Review `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Other fields
 }
 
@@ -68,4 +69,26 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 	}
 
 	return jsonString, nil
+}
+
+func (post *Post) AfterDelete(tx *gorm.DB) (err error) {
+	// First, fetch all associated images
+	var images []Image
+	tx.Model(post).Association("Images").Find(&images)
+
+	// Delete each associated image
+	for _, image := range images {
+		tx.Unscoped().Delete(&image)
+	}
+
+	return
+}
+
+func (image *Image) BeforeDelete(tx *gorm.DB) (err error) {
+
+	if image.Path != "" {
+		os.Remove(image.Path)
+	}
+
+	return
 }

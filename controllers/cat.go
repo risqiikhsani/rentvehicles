@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -13,14 +11,14 @@ import (
 
 func GetCats(c *gin.Context) {
 	var cats []models.Cat
-	models.DB.Find(&cats)
+	models.DB.Preload("Images").Find(&cats)
 	c.JSON(200, cats)
 }
 
 func GetCatById(c *gin.Context) {
 	catId := c.Param("cat_id")
 	var cat models.Cat
-	result := models.DB.First(&cat, catId)
+	result := models.DB.Preload("Images").First(&cat, catId)
 
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Location not found"})
@@ -41,7 +39,7 @@ func CreateCat(c *gin.Context) {
 	}
 
 	var cat models.Cat
-	if err := c.ShouldBindJSON(&cat); err != nil {
+	if err := c.ShouldBind(&cat); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -82,20 +80,13 @@ func UpdateCatById(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBindJSON(&existingCat); err != nil {
+	if err := c.ShouldBind(&existingCat); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := utils.Validate.Struct(existingCat); err != nil {
-		var errs []string // Change the type to a string slice
-
-		for _, err := range err.(validator.ValidationErrors) {
-			// You can create a more descriptive error message if needed
-			fieldError := fmt.Sprintf("Field: %s, Error: %s", err.Field(), err.Tag())
-			errs = append(errs, fieldError)
-		}
-
+		errs := utils.TranslateError(err, utils.En)
 		c.JSON(400, gin.H{"errors": errs})
 		return
 	}

@@ -7,10 +7,12 @@ import (
 )
 
 var En ut.Translator
+
+// only one instance as translators within are shared + goroutine safe
 var universalTraslator *ut.UniversalTranslator
 
 func InitializeTranslator() {
-	english := en.New()
-	universalTraslator = ut.New(english, english)
+	e := en.New()
+	universalTraslator = ut.New(e, e)
 	En, _ = universalTraslator.GetTranslator("en")
 }

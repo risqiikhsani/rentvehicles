@@ -9,14 +9,14 @@ import (
 )
 
 func GetLocations(c *gin.Context) {
-	var locations []models.GoogleMapLocation
+	var locations []models.Location
 	models.DB.Find(&locations)
 	c.JSON(200, locations)
 }
 
 func GetLocationById(c *gin.Context) {
 	locationId := c.Param("location_id")
-	var location models.GoogleMapLocation
+	var location models.Location
 	result := models.DB.First(&location, locationId)
 
 	if result.Error != nil {
@@ -27,6 +27,7 @@ func GetLocationById(c *gin.Context) {
 
 func CreateLocation(c *gin.Context) {
 	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+
 	if !authenticated {
 		return
 	}
@@ -36,7 +37,7 @@ func CreateLocation(c *gin.Context) {
 		return
 	}
 
-	var location models.GoogleMapLocation
+	var location models.Location
 	if err := c.ShouldBindJSON(&location); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -59,7 +60,7 @@ func UpdateLocationById(c *gin.Context) {
 	}
 
 	locationId := c.Param("location_id")
-	var existingLocation models.GoogleMapLocation
+	var existingLocation models.Location
 	if err := models.DB.Where("id = ?", locationId).First(&existingLocation).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "location not found"})
 		return
@@ -93,7 +94,7 @@ func DeleteLocationById(c *gin.Context) {
 	}
 
 	locationId := c.Param("location_id")
-	var location models.GoogleMapLocation
+	var location models.Location
 	result := models.DB.First(&location, locationId)
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Comment not found"})

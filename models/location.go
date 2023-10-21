@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type GoogleMapLocation struct {
+type Location struct {
 	gorm.Model // This includes fields like ID, CreatedAt, UpdatedAt, and DeletedAt
 
 	Name        string `gorm:"not null" binding:"required"`
@@ -13,4 +13,5 @@ type GoogleMapLocation struct {
 	Latitude    string
 	Longitude   string
 	UserID      uint
+	Posts       []Post
 }

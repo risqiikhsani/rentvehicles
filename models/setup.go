@@ -46,7 +46,7 @@ func ConnectDB() {
 	db.AutoMigrate(&Rent{})
 	db.AutoMigrate(&Image{})
 	db.AutoMigrate(&Booking{})
-	db.AutoMigrate(&GoogleMapLocation{})
+	db.AutoMigrate(&Location{})
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&Transaction{})
 	db.AutoMigrate(&Cat{}) // for testing purpose !!!

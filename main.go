@@ -6,33 +6,27 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
+	"github.com/risqiikhsani/rentvehicles/configs"
 	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
 	"github.com/risqiikhsani/rentvehicles/utils"
-	"github.com/spf13/viper"
+	// "github.com/spf13/viper"
 )
 
 func main() {
 
-	viper.AddConfigPath("./configs")
-	viper.SetConfigName("config") // Register config file name (no extension)
-	viper.SetConfigType("yaml")   // Look for specific type
-	viper.ReadInConfig()
-	// Read the configuration file
-	if err := viper.ReadInConfig(); err != nil {
+	appConfig, err := configs.LoadAppConfig("./configs")
+	secretConfig, err := configs.LoadSecretConfig("./")
+	if err != nil {
 		panic(err)
 	}
-	serverPort := viper.GetString("server_port")
 
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+	serverPort := appConfig.ServerPort
 
-	baseURL := os.Getenv("BASE_URL")
-	static_image_path := viper.GetString("static_images_path")
+	baseURL := secretConfig.BaseUrl
+	static_image_path := appConfig.StaticImagesPath
 	models.SetBaseURL(baseURL)
 	models.SetStaticImagePath(static_image_path)
 
@@ -43,7 +37,7 @@ func main() {
 	gin.DisableConsoleColor()
 
 	// Logging to a file.
-	f, _ := os.Create(viper.GetString("log_file"))
+	f, _ := os.Create(appConfig.LogFile)
 	//gin.DefaultWriter = io.MultiWriter(f)
 
 	// Use the following code if you need to write the logs to file and console at the same time.
@@ -55,10 +49,10 @@ func main() {
 	utils.InitializeTranslator() // translator first , because initializeValidator needs it
 	utils.InitializeValidator()
 
-	static_path := viper.GetString("static_path")
+	static_path := appConfig.StaticPath
 	r.Static("/static", "./"+static_path)
 
-	models.ConnectDB()
+	models.ConnectDB(secretConfig)
 
 	public := r.Group("/api")
 	public.Use(middlewares.LogMiddleware())

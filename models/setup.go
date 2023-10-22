@@ -3,28 +3,29 @@ package models
 import (
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
+	"github.com/risqiikhsani/rentvehicles/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
-func ConnectDB() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+func ConnectDB(secret configs.SecretsConfig) {
+
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	panic("Error loading .env file")
+	// }
 
 	// Get PostgreSQL connection details from environment variables
-	dbHost := os.Getenv("POSTGRES_HOST") // Change this if your database is hosted elsewhere
-	dbPort := os.Getenv("POSTGRES_PORT") // Default PostgreSQL port
-	dbName := os.Getenv("POSTGRES_DB")
-	dbUser := os.Getenv("POSTGRES_USER")
-	dbPassword := os.Getenv("POSTGRES_PASSWORD")
-	sslMode := os.Getenv("SSLMODE") // Adjust this based on your PostgreSQL setup
+	dbHost := secret.PostgresHost // Change this if your database is hosted elsewhere
+	dbPort := secret.PostgresPort // Default PostgreSQL port
+	dbName := secret.PostgresDb
+	dbUser := secret.PostgresUser
+	dbPassword := secret.PostgresPassword
+	sslMode := secret.Sslmode // Adjust this based on your PostgreSQL setup
 
 	// Construct the DATABASE_URL
 	dbURL := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", dbUser, dbPassword, dbHost, dbPort, dbName, sslMode)

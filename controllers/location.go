@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
+	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
 func GetLocations(c *gin.Context) {
@@ -42,7 +43,15 @@ func CreateLocation(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
 	location.UserID = userID
+
+	if err := utils.Validate.Struct(location); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
+		return
+	}
+
 	// Create the location in the database
 	if err := models.DB.Create(&location).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to create comment"})
@@ -74,6 +83,12 @@ func UpdateLocationById(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&existingLocation); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := utils.Validate.Struct(existingLocation); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
 		return
 	}
 

@@ -9,16 +9,16 @@ import (
 
 type Rent struct {
 	gorm.Model
-	Text         string `json:"text"`
-	UserID       uint   // default colum name will be user_id, you can specify it with `gorm:"column:desiredname"`
-	PostID       uint
-	StartDate    time.Time
-	EndDate      time.Time
-	PickupDate   time.Time
-	ReturnDate   time.Time
-	LicensePlate string  `json:"license_plate"`
-	Status       string  `gorm:"default:'ReadyToPickup'" json:"status"`
-	Images       []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Text         string    `json:"text" form:"text"`
+	UserID       uint      `json:"user_id" form:"user_id" validate:"required"`
+	PostID       uint      `json:"post_id" form:"post_id" validate:"required"`
+	StartDate    time.Time `json:"start_date" form:"start_date" validate:"required"`
+	EndDate      time.Time `json:"end_date" form:"end_date" validate:"required,gtfield=StartDate"`
+	PickupDate   time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
+	ReturnDate   time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
+	LicensePlate string    `json:"license_plate" form:"license_plate"`
+	Status       string    `json:"status" form:"status" gorm:"default:'ReadyToPickup'"`
+	Images       []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Other fields
 }
 
@@ -27,8 +27,21 @@ type Rent struct {
 // OnGoing
 // Done
 
+func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
+	// Fetch the associated Post model by ID
+	var post Post
+	if err := tx.First(&post, rent.PostID).Error; err != nil {
+		return err
+	}
+	// If post.Units is zero or post.Available is false, cancel the creation of rent
+	if post.Units == 0 || !post.Available {
+		return fmt.Errorf("Cannot create Rent, Item is not available")
+	}
+
+	return nil
+}
+
 func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
-	fmt.Println("after create hook is running")
 	// Fetch the associated Post model by ID
 	var post Post
 	if err := tx.First(&post, rent.PostID).Error; err != nil {

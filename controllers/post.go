@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
+	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
 // Implement other route handlers similarly
@@ -55,46 +55,17 @@ func CreatePost(c *gin.Context) {
 	var post models.Post
 
 	if err := c.ShouldBind(&post); err != nil {
-		// Create a map to hold custom error messages
-		errors := make(map[string]string)
-
-		for _, fieldError := range err.(validator.ValidationErrors) {
-			// field := strings.ToLower(fieldError.Field()) // Convert to lowercase
-			field := fieldError.StructField()
-			tag := fieldError.Tag()
-
-			// Customize error messages based on the field and tag
-			switch {
-			case tag == "required":
-				errors[field] = field + " is required."
-			case tag == "min" && field == "year":
-				errors[field] = field + " must be at least X years old."
-			// Add more cases for other tags and fields
-			default:
-				errors[field] = field + " is invalid."
-			}
-		}
-
-		c.JSON(400, gin.H{"errors": errors})
+		c.JSON(400, gin.H{"errors": err.Error()})
 		return
 	}
-
-	// Retrieve the text field from the form data)
-	// post.Brand = c.PostForm("brand")
-	// post.BrandModel = c.PostForm("brand_model")
-	// post.FuelType = c.PostForm("fuel_type")
-	// post.LocationID, _ = utils.ConvertToUint(c.PostForm("location_id"))
-	// post.Transmission = c.PostForm("transmission")
-	// post.Units, _ = utils.ConvertToUint(c.PostForm("units"))
-	// post.VehicleType = c.PostForm("vehicle_type")
-	// post.Year, _ = utils.ConvertToUint(c.PostForm("year"))
-	// post.PricePerDay, _ = utils.ConvertToUint(c.PostForm("price_per_day"))
-	// post.PricePerWeek, _ = utils.ConvertToUint(c.PostForm("price_per_week"))
-	// post.PricePerMonth, _ = utils.ConvertToUint(c.PostForm("price_per_month"))
-	// post.Discount, _ = utils.ConvertToUint(c.PostForm("discount"))
-
 	// Set the post's user ID to the authenticated user
 	post.UserID = userID
+
+	if err := utils.Validate.Struct(post); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
+		return
+	}
 
 	// Create the post in the database
 	if err := models.DB.Create(&post).Error; err != nil {
@@ -152,6 +123,12 @@ func UpdatePostById(c *gin.Context) {
 	// Update the text of the post
 	if err := c.ShouldBind(&existingPost); err != nil {
 		c.JSON(400, gin.H{"errors": err.Error()})
+		return
+	}
+
+	if err := utils.Validate.Struct(existingPost); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
 		return
 	}
 

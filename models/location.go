@@ -7,11 +7,11 @@ import (
 type Location struct {
 	gorm.Model // This includes fields like ID, CreatedAt, UpdatedAt, and DeletedAt
 
-	Name        string `gorm:"not null" binding:"required"`
+	Name        string `gorm:"not null" validate:"required"`
 	Description string
-	Address     string `gorm:"not null" binding:"required"`
+	Address     string `gorm:"not null" validate:"required"`
 	Latitude    string
 	Longitude   string
-	UserID      uint
+	UserID      uint `validate:"required,numeric"`
 	Posts       []Post
 }

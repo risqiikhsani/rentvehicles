@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
+	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
 func GetRents(c *gin.Context) {
@@ -60,6 +61,12 @@ func CreateRent(c *gin.Context) {
 	}
 
 	rent.UserID = userID
+
+	if err := utils.Validate.Struct(rent); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
+		return
+	}
 
 	// Fetch the associated Post based on PostID
 	var post models.Post
@@ -121,6 +128,12 @@ func UpdateRentById(c *gin.Context) {
 
 	if err := c.ShouldBind(&existingRent); err != nil {
 		c.JSON(400, gin.H{"errors": err.Error()})
+		return
+	}
+
+	if err := utils.Validate.Struct(existingRent); err != nil {
+		errs := utils.TranslateError(err, utils.En)
+		c.JSON(400, gin.H{"errors": errs})
 		return
 	}
 

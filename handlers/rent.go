@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"mime/multipart"
-	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -18,9 +17,7 @@ func DeleteRentImages(c *gin.Context, rentID uint, imageIDs []string) error {
 		}
 
 		// Remove the image file from the file system
-		if err := os.Remove(imageToDelete.Path); err != nil {
-			return err
-		}
+		// handled by hooks in model
 
 		// Delete the image record from the database
 		if err := models.DB.Delete(&imageToDelete).Error; err != nil {

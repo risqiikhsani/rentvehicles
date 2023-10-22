@@ -31,7 +31,11 @@ func ConnectDB() {
 
 	// Initialize the database connection
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{
+		// https://gorm.io/docs/constraints.html
 		DisableForeignKeyConstraintWhenMigrating: true,
+		// https://gorm.io/docs/performance.html
+		SkipDefaultTransaction: true,
+		PrepareStmt:            true,
 	})
 
 	if err != nil {

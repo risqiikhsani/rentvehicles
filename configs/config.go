@@ -27,6 +27,9 @@ type MainConfig struct {
 	StaticImagesPath string `mapstructure:"static_images_path"`
 }
 
+var MainConf MainConfig
+var SecretConf SecretsConfig
+
 // // LoadConfig reads configuration from two files or environment variables.
 // func LoadConfig(appPath, secretsPath string) (mainConfig MainConfig, secretConfig SecretsConfig, err error) {
 // 	appViper := viper.New()
@@ -75,6 +78,16 @@ func LoadAppConfig(path string) (mainConfig MainConfig, err error) {
 	if err = appViper.Unmarshal(&mainConfig); err != nil {
 		return
 	}
+
+	MainConf = MainConfig{
+		ServerPort:       mainConfig.ServerPort,
+		LogFile:          mainConfig.LogFile,
+		FeatureEnabled:   mainConfig.FeatureEnabled,
+		MaxItemsPerPage:  mainConfig.MaxItemsPerPage,
+		StaticPath:       mainConfig.StaticPath,
+		StaticImagesPath: mainConfig.StaticImagesPath,
+	}
+
 	return mainConfig, nil
 }
 
@@ -91,6 +104,20 @@ func LoadSecretConfig(path string) (secretConfig SecretsConfig, err error) {
 	// Unmarshal the configurations into respective structs
 	if err = secretsViper.Unmarshal(&secretConfig); err != nil {
 		return
+	}
+
+	SecretConf = SecretsConfig{
+		SecretKey:           secretConfig.SecretKey,
+		PostgresDb:          secretConfig.PostgresDb,
+		PostgresUser:        secretConfig.PostgresUser,
+		PostgresPassword:    secretConfig.PostgresPassword,
+		PostgresHost:        secretConfig.PostgresHost,
+		PostgresPort:        secretConfig.PostgresPort,
+		Sslmode:             secretConfig.Sslmode,
+		BaseUrl:             secretConfig.BaseUrl,
+		EmailSenderName:     secretConfig.EmailSenderName,
+		EmailSenderAddress:  secretConfig.EmailSenderAddress,
+		EmailSenderPassword: secretConfig.EmailSenderPassword,
 	}
 	return secretConfig, nil
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	// "github.com/joho/godotenv"
+
 	"github.com/risqiikhsani/rentvehicles/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,20 +13,28 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB(secret configs.SecretsConfig) {
+func ConnectDB() {
 
 	// err := godotenv.Load()
 	// if err != nil {
 	// 	panic("Error loading .env file")
 	// }
 
+	// // Get PostgreSQL connection details from environment variables
+	// dbHost := secret.PostgresHost // Change this if your database is hosted elsewhere
+	// dbPort := secret.PostgresPort // Default PostgreSQL port
+	// dbName := secret.PostgresDb
+	// dbUser := secret.PostgresUser
+	// dbPassword := secret.PostgresPassword
+	// sslMode := secret.Sslmode // Adjust this based on your PostgreSQL setup
+
 	// Get PostgreSQL connection details from environment variables
-	dbHost := secret.PostgresHost // Change this if your database is hosted elsewhere
-	dbPort := secret.PostgresPort // Default PostgreSQL port
-	dbName := secret.PostgresDb
-	dbUser := secret.PostgresUser
-	dbPassword := secret.PostgresPassword
-	sslMode := secret.Sslmode // Adjust this based on your PostgreSQL setup
+	dbHost := configs.SecretConf.PostgresHost
+	dbPort := configs.SecretConf.PostgresPort
+	dbName := configs.SecretConf.PostgresDb
+	dbUser := configs.SecretConf.PostgresUser
+	dbPassword := configs.SecretConf.PostgresPassword
+	sslMode := configs.SecretConf.Sslmode
 
 	// Construct the DATABASE_URL
 	dbURL := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", dbUser, dbPassword, dbHost, dbPort, dbName, sslMode)
@@ -55,6 +64,7 @@ func ConnectDB(secret configs.SecretsConfig) {
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&Transaction{})
 	db.AutoMigrate(&Cat{}) // for testing purpose !!!
+	db.AutoMigrate(&ForgotPassword{})
 
 	fmt.Println("Connected to PostgreSQL database")
 

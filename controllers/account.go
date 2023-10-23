@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/rentvehicles/configs"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -265,4 +266,55 @@ func GetAccount(c *gin.Context) {
 	}
 
 	c.JSON(200, existingAccount)
+}
+
+type ForgotPasswordInput struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+func ForgotPassword(c *gin.Context) {
+	var input ForgotPasswordInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the email exists in the database
+	var existingAccount models.Account
+	if err := models.DB.Where("email = ?", input.Email).First(&existingAccount).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email not associated with any account"})
+		return
+	}
+
+	// Generate a random token for password reset
+	resetToken := utils.RandomStringUuid() // You can implement a function to generate secure random strings
+
+	// Store the reset token and its expiration timestamp in the database
+	resetTokenRecord := models.ForgotPassword{
+		Token:     resetToken,
+		AccountID: existingAccount.ID,
+	}
+	models.DB.Create(&resetTokenRecord)
+
+	// Send an email to the user with a link containing the resetToken
+	// You need to implement an email sending mechanism to send the reset link to the user's email address.
+
+	sender := utils.NewGmailSender(configs.SecretConf.EmailSenderName, configs.SecretConf.EmailSenderAddress, configs.SecretConf.EmailSenderPassword)
+
+	subject := "A test email"
+	content := `
+    <h1>Hello world</h1>
+    <p>This is a test message from <a href="http://techschool.guru">Tech School</a></p>
+    `
+	to := []string{"risqiikhsani12@gmail.com"}
+	// attachFiles := []string{"../README.md"}
+
+	err := sender.SendEmail(subject, content, to, nil, nil, nil)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Something went wrong. Failed to send email"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset instructions sent to your email"})
 }

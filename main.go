@@ -52,7 +52,7 @@ func main() {
 	static_path := appConfig.StaticPath
 	r.Static("/static", "./"+static_path)
 
-	models.ConnectDB(secretConfig)
+	models.ConnectDB()
 
 	public := r.Group("/api")
 	public.Use(middlewares.LogMiddleware())

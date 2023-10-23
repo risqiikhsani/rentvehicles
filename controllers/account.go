@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/configs"
@@ -297,18 +298,22 @@ func ForgotPassword(c *gin.Context) {
 	}
 	models.DB.Create(&resetTokenRecord)
 
-	// Send an email to the user with a link containing the resetToken
-	// You need to implement an email sending mechanism to send the reset link to the user's email address.
+	// URL-encode the token
+	encodedToken := url.QueryEscape(resetToken)
 
+	// Construct the reset password link by appending the encoded token to the URL
+	resetPasswordURL := "http://localhost:8080/api/forgot-password/?token=" + encodedToken
+
+	// Send an email to the user with the resetPasswordURL
 	sender := utils.NewGmailSender(configs.SecretConf.EmailSenderName, configs.SecretConf.EmailSenderAddress, configs.SecretConf.EmailSenderPassword)
 
-	subject := "A test email"
+	subject := "Forgot Password"
 	content := `
-    <h1>Hello world</h1>
-    <p>This is a test message from <a href="http://techschool.guru">Tech School</a></p>
-    `
-	to := []string{"risqiikhsani12@gmail.com"}
-	// attachFiles := []string{"../README.md"}
+		<h1>Hello</h1>
+		<p>This is a forgot password link to update your password. Click the following link to reset your password:</p>
+		<a href="` + resetPasswordURL + `">Reset Password</a>
+	`
+	to := []string{existingAccount.Email}
 
 	err := sender.SendEmail(subject, content, to, nil, nil, nil)
 	if err != nil {

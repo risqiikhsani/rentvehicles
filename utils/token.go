@@ -1,13 +1,13 @@
 package utils
 
 import (
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/risqiikhsani/rentvehicles/configs"
 )
 
-var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
+var jwtSecret = configs.SecretConf.SecretKey
 
 func GenerateJWTToken(user_id uint, user_role string) (string, error) {
 	// if user_role == "" {

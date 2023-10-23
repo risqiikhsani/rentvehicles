@@ -227,6 +227,13 @@ func UpdateAccount(c *gin.Context) {
 		return
 	}
 
+	// Hash the password before storing it in the database
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(accountUpdate.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash the password"})
+		return
+	}
+
 	// Copy the allowed fields from accountUpdate to existingAccount
 	// Only update the fields if they are provided in the request
 	if accountUpdate.Email != "" {
@@ -234,7 +241,7 @@ func UpdateAccount(c *gin.Context) {
 	}
 
 	if accountUpdate.Password != "" {
-		existingAccount.Password = accountUpdate.Password
+		existingAccount.Password = string(hashedPassword)
 	}
 
 	if accountUpdate.Phone != "" {
@@ -322,4 +329,61 @@ func ForgotPassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Password reset instructions sent to your email"})
+}
+
+type ResetPasswordInput struct {
+	Password  string `json:"password" binding:"required"`
+	Password2 string `json:"password2" binding:"required"`
+}
+
+func ResetPassword(c *gin.Context) {
+	token := c.DefaultQuery("token", "")
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or missing token"})
+		return
+	}
+
+	// Check if the token exists in the database and is not expired
+	var resetTokenRecord models.ForgotPassword
+	if err := models.DB.Where("token = ? AND expired = false", token).First(&resetTokenRecord).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired token"})
+		return
+	}
+
+	var input ResetPasswordInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the passwords match
+	if input.Password != input.Password2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Passwords do not match"})
+		return
+	}
+
+	// Hash the password before storing it in the database
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash the password"})
+		return
+	}
+
+	var existingAccount models.Account
+	if err := models.DB.First(&existingAccount, resetTokenRecord.AccountID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Account not found"})
+		return
+	}
+
+	existingAccount.Password = string(hashedPassword)
+
+	// Update the account's password in the database
+	if err := models.DB.Save(&existingAccount).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password has been successfully updated."})
 }

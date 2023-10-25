@@ -317,7 +317,7 @@ func ForgotPassword(c *gin.Context) {
 	subject := "Forgot Password"
 	content := `
 		<h1>Hello</h1>
-		<p>This is a forgot password link to update your password. Click the following link to reset your password:</p>
+		<p>Forgot password has been requested. Click the following link to reset your password:</p>
 		<a href="` + resetPasswordURL + `">Reset Password</a>
 	`
 	to := []string{existingAccount.Email}

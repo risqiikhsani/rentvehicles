@@ -15,20 +15,6 @@ var DB *gorm.DB
 
 func ConnectDB() {
 
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	panic("Error loading .env file")
-	// }
-
-	// // Get PostgreSQL connection details from environment variables
-	// dbHost := secret.PostgresHost // Change this if your database is hosted elsewhere
-	// dbPort := secret.PostgresPort // Default PostgreSQL port
-	// dbName := secret.PostgresDb
-	// dbUser := secret.PostgresUser
-	// dbPassword := secret.PostgresPassword
-	// sslMode := secret.Sslmode // Adjust this based on your PostgreSQL setup
-
-	// Get PostgreSQL connection details from environment variables
 	dbHost := configs.SecretConf.PostgresHost
 	dbPort := configs.SecretConf.PostgresPort
 	dbName := configs.SecretConf.PostgresDb
@@ -54,20 +40,62 @@ func ConnectDB() {
 	}
 
 	// Perform database operations here
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Account{})
-	db.AutoMigrate(&Post{})
-	db.AutoMigrate(&Rent{})
-	db.AutoMigrate(&Image{})
-	db.AutoMigrate(&Booking{})
-	db.AutoMigrate(&Location{})
-	db.AutoMigrate(&Review{})
-	db.AutoMigrate(&Transaction{})
-	db.AutoMigrate(&Cat{}) // for testing purpose !!!
-	db.AutoMigrate(&ForgotPassword{})
+	// db.AutoMigrate(&User{})
+	// db.AutoMigrate(&Account{})
+	// db.AutoMigrate(&Post{})
+	// db.AutoMigrate(&Rent{})
+	// db.AutoMigrate(&Image{})
+	// db.AutoMigrate(&Booking{})
+	// db.AutoMigrate(&Location{})
+	// db.AutoMigrate(&Review{})
+	// db.AutoMigrate(&Transaction{})
+	// db.AutoMigrate(&Cat{}) // for testing purpose !!!
+	// db.AutoMigrate(&ForgotPassword{})
+
+	// Perform database operations here with error handling
+	if err := autoMigrateModel(db, &User{}); err != nil {
+		log.Fatalf("Error migrating User: %v", err)
+	}
+	if err := autoMigrateModel(db, &Account{}); err != nil {
+		log.Fatalf("Error migrating Account: %v", err)
+	}
+	if err := autoMigrateModel(db, &Post{}); err != nil {
+		log.Fatalf("Error migrating Post: %v", err)
+	}
+	if err := autoMigrateModel(db, &Rent{}); err != nil {
+		log.Fatalf("Error migrating Rent: %v", err)
+	}
+	if err := autoMigrateModel(db, &Image{}); err != nil {
+		log.Fatalf("Error migrating Image: %v", err)
+	}
+	if err := autoMigrateModel(db, &Booking{}); err != nil {
+		log.Fatalf("Error migrating Booking: %v", err)
+	}
+	if err := autoMigrateModel(db, &Location{}); err != nil {
+		log.Fatalf("Error migrating Location: %v", err)
+	}
+	if err := autoMigrateModel(db, &Review{}); err != nil {
+		log.Fatalf("Error migrating Review: %v", err)
+	}
+	if err := autoMigrateModel(db, &Transaction{}); err != nil {
+		log.Fatalf("Error migrating Transaction: %v", err)
+	}
+	if err := autoMigrateModel(db, &Cat{}); err != nil {
+		log.Fatalf("Error migrating Cat: %v", err)
+	}
+	if err := autoMigrateModel(db, &ForgotPassword{}); err != nil {
+		log.Fatalf("Error migrating ForgotPassword: %v", err)
+	}
 
 	fmt.Println("Connected to PostgreSQL database")
 
 	DB = db
 
+}
+
+func autoMigrateModel(db *gorm.DB, model interface{}) error {
+	if err := db.AutoMigrate(model); err != nil {
+		return err
+	}
+	return nil
 }

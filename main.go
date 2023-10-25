@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,9 @@ import (
 func main() {
 
 	appConfig, err := configs.LoadAppConfig("./configs")
+	if err != nil {
+		panic(err)
+	}
 	secretConfig, err := configs.LoadSecretConfig("./")
 	if err != nil {
 		panic(err)
@@ -65,5 +69,7 @@ func main() {
 	routes.SetupCatRoutes(public)
 
 	addr := fmt.Sprintf(":%s", serverPort)
-	r.Run(addr)
+	if err := r.Run(addr); err != nil {
+		log.Fatalf("Failed to start the server: %v", err)
+	}
 }

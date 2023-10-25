@@ -28,6 +28,9 @@ func resizeImage(inputPath string, outputPath string, width int, height int) err
 	}
 	defer outFile.Close()
 
-	jpeg.Encode(outFile, resizedImg, nil)
+	if err = jpeg.Encode(outFile, resizedImg, nil); err != nil {
+		return err
+	}
+
 	return nil
 }

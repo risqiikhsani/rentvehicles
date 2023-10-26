@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	// "github.com/joho/godotenv"
 	"github.com/risqiikhsani/rentvehicles/configs"
+	"github.com/risqiikhsani/rentvehicles/controllers"
 	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
@@ -22,10 +23,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	secretConfig, err := configs.LoadSecretConfig("./")
 	if err != nil {
 		panic(err)
 	}
+
+	controllers.SetAppConfig(appConfig)
+	controllers.SetSecretConfig(secretConfig)
+	utils.SetAppConfig(appConfig)
+	utils.SetSecretConfig(secretConfig)
+
+	fmt.Println("JWT " + secretConfig.SecretKey)
 
 	serverPort := appConfig.ServerPort
 
@@ -56,7 +65,7 @@ func main() {
 	static_path := appConfig.StaticPath
 	r.Static("/static", "./"+static_path)
 
-	models.ConnectDB()
+	models.ConnectDB(secretConfig)
 
 	public := r.Group("/api")
 	public.Use(middlewares.LogMiddleware())

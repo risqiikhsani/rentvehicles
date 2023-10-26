@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/risqiikhsani/rentvehicles/configs"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -26,6 +25,8 @@ import (
 // 	}
 
 // }
+
+var secretConf = SecretConf
 
 type RegisterInput struct {
 	Username  string `json:"username" binding:"required"`
@@ -312,7 +313,7 @@ func ForgotPassword(c *gin.Context) {
 	resetPasswordURL := "http://localhost:8080/api/forgot-password/?token=" + encodedToken
 
 	// Send an email to the user with the resetPasswordURL
-	sender := utils.NewGmailSender(configs.SecretConf.EmailSenderName, configs.SecretConf.EmailSenderAddress, configs.SecretConf.EmailSenderPassword)
+	sender := utils.NewGmailSender(secretConf.EmailSenderName, secretConf.EmailSenderAddress, secretConf.EmailSenderPassword)
 
 	subject := "Forgot Password"
 	content := `

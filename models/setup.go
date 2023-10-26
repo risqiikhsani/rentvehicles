@@ -13,14 +13,14 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB() {
+func ConnectDB(secretConf configs.SecretsConfig) {
 
-	dbHost := configs.SecretConf.PostgresHost
-	dbPort := configs.SecretConf.PostgresPort
-	dbName := configs.SecretConf.PostgresDb
-	dbUser := configs.SecretConf.PostgresUser
-	dbPassword := configs.SecretConf.PostgresPassword
-	sslMode := configs.SecretConf.Sslmode
+	dbHost := secretConf.PostgresHost
+	dbPort := secretConf.PostgresPort
+	dbName := secretConf.PostgresDb
+	dbUser := secretConf.PostgresUser
+	dbPassword := secretConf.PostgresPassword
+	sslMode := secretConf.Sslmode
 
 	// Construct the DATABASE_URL
 	dbURL := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", dbUser, dbPassword, dbHost, dbPort, dbName, sslMode)

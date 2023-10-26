@@ -1,18 +1,20 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/risqiikhsani/rentvehicles/configs"
 )
 
-var jwtSecret = configs.SecretConf.SecretKey
+var jwtSecret = SecretConf.SecretKey
 
 func GenerateJWTToken(user_id uint, user_role string) (string, error) {
 	// if user_role == "" {
 	// 	user_role = "basic"
 	// }
+
+	fmt.Println("jwt " + jwtSecret)
 
 	claims := jwt.MapClaims{
 		// "authenticated": true,

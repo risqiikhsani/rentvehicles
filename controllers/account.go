@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/rentvehicles/configs"
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -25,8 +27,6 @@ import (
 // 	}
 
 // }
-
-var secretConf = SecretConf
 
 type RegisterInput struct {
 	Username  string `json:"username" binding:"required"`
@@ -178,6 +178,10 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("user id")
+	fmt.Println(existingUser.ID)
+	fmt.Println("user role")
+	fmt.Println(existingUser.Role)
 	// Generate and return a JWT token on successful login
 	token, err := utils.GenerateJWTToken(existingUser.ID, existingUser.Role)
 	if err != nil {
@@ -313,6 +317,7 @@ func ForgotPassword(c *gin.Context) {
 	resetPasswordURL := "http://localhost:8080/api/forgot-password/?token=" + encodedToken
 
 	// Send an email to the user with the resetPasswordURL
+	secretConf := configs.GetSecretConfig()
 	sender := utils.NewGmailSender(secretConf.EmailSenderName, secretConf.EmailSenderAddress, secretConf.EmailSenderPassword)
 
 	subject := "Forgot Password"

@@ -27,6 +27,60 @@ type MainConfig struct {
 	StaticImagesPath string `mapstructure:"static_images_path"`
 }
 
+var MainConfigInstance MainConfig
+var SecretsConfigInstance SecretsConfig
+
+func SetMainConfig(config MainConfig) {
+	MainConfigInstance = config
+}
+
+func GetMainConfig() MainConfig {
+	return MainConfigInstance
+}
+
+func SetSecretConfig(config SecretsConfig) {
+	SecretsConfigInstance = config
+}
+
+func GetSecretConfig() SecretsConfig {
+	return SecretsConfigInstance
+}
+
+// // LoadConfig reads configuration from two files or environment variables.
+// func LoadConfig(appPath, secretsPath string) (mainConfig MainConfig, secretConfig SecretsConfig, err error) {
+// 	appViper := viper.New()
+// 	secretsViper := viper.New()
+
+// 	// Set up the Viper instances for the two files
+// 	setupViper(appViper, appPath, "config", "yaml")
+// 	setupViper(secretsViper, secretsPath, "app", "env")
+
+// 	// Load the configurations
+// 	err = appViper.ReadInConfig()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = secretsViper.ReadInConfig()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	// Unmarshal the configurations into respective structs
+// 	err = appViper.Unmarshal(&mainConfig)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = secretsViper.Unmarshal(&secretConfig)
+// 	if err != nil {
+// 		return
+// 	}
+// 	return
+// }
+
+// LoadAppConfig reads the application configuration from a file or environment variables.
+// LoadAppConfig reads the application configuration from a file or environment variables.
 func LoadAppConfig(path string) (mainConfig MainConfig, err error) {
 	appViper := viper.New()
 	setupViper(appViper, path, "config", "yaml")

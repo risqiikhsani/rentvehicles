@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	// "github.com/joho/godotenv"
 	"github.com/risqiikhsani/rentvehicles/configs"
-	"github.com/risqiikhsani/rentvehicles/controllers"
 	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
@@ -29,10 +28,8 @@ func main() {
 		panic(err)
 	}
 
-	controllers.SetAppConfig(appConfig)
-	controllers.SetSecretConfig(secretConfig)
-	utils.SetAppConfig(appConfig)
-	utils.SetSecretConfig(secretConfig)
+	configs.SetMainConfig(appConfig)
+	configs.SetSecretConfig(secretConfig)
 
 	fmt.Println("JWT " + secretConfig.SecretKey)
 

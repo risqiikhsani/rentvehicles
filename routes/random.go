@@ -8,6 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var randomGroup *gin.Engine
+
+func Ping(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "pong",
+	})
+}
+
 func SetupTestRoutes(public *gin.RouterGroup) {
 	randomGroup := public.Group("/random-test")
 	{
@@ -23,11 +31,7 @@ func SetupTestRoutes(public *gin.RouterGroup) {
 			fmt.Printf("Cookie value: %s \n", cookie)
 		})
 
-		randomGroup.GET("/ping", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"message": "pong",
-			})
-		})
+		randomGroup.GET("/ping", Ping)
 
 		randomGroup.GET("/long_async", func(c *gin.Context) {
 			// create copy to be used inside the goroutine

@@ -3,31 +3,37 @@ package utils
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestCheckPassword(t *testing.T) {
+
 	// Define test cases
 	testCases := []struct {
 		password       string
 		hashedPassword string
 		expectError    bool
 	}{
-		{"password123", "$2a$14$CZ4DTiN5r4..Qq3Je0TRcuwLOjC/q9Yzm7zNZQdZ54vPXrOeP85LS", false},  // Matched password
-		{"wrongpassword", "$2a$14$CZ4DTiN5r4..Qq3Je0TRcuwLOjC/q9Yzm7zNZQdZ54vPXrOeP85LS", true}, // Non-matching password
+		{"password123", hashPassword("password123"), false},  // Matched password
+		{"wrongpassword", hashPassword("password123"), true}, // Non-matching password
 	}
 
 	// Initialize the require package with the testing.T instance
-	require := require.New(t)
-
+	// require := require.New(t)
+	assert := assert.New(t)
 	for _, tc := range testCases {
 		t.Run(tc.password, func(t *testing.T) {
 			err := CheckPassword(tc.password, tc.hashedPassword)
-			if tc.expectError {
-				require.Error(err, "Expected an error for password: %s", tc.password)
-			} else {
-				require.NoError(err, "Expected no error for password: %s", tc.password)
-			}
+			assert.Equal(tc.expectError, (err != nil), "they should be equal")
 		})
 	}
+}
+
+func hashPassword(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return string(hash)
 }

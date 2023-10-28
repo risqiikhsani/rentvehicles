@@ -204,6 +204,7 @@ func UpdateAccount(c *gin.Context) {
 	// Check if the user is authenticated
 	userID, _, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -260,11 +261,10 @@ func UpdateAccount(c *gin.Context) {
 
 func GetAccount(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.RequireAuthentication(c, "")
 	if !authenticated {
 		return
 	}
-
 	var existingUser models.User
 	if err := models.DB.First(&existingUser, userID).Error; err != nil {
 		c.JSON(404, gin.H{"error": "User not found"})

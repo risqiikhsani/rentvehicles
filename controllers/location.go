@@ -27,14 +27,8 @@ func GetLocationById(c *gin.Context) {
 }
 
 func CreateLocation(c *gin.Context) {
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
-
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
-		return
-	}
-
-	if userRole != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create location"})
 		return
 	}
 
@@ -63,7 +57,7 @@ func CreateLocation(c *gin.Context) {
 
 func UpdateLocationById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}
@@ -103,7 +97,7 @@ func UpdateLocationById(c *gin.Context) {
 
 func DeleteLocationById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}

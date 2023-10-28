@@ -10,8 +10,7 @@ import (
 )
 
 func GetRents(c *gin.Context) {
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
-
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "")
 	if !authenticated {
 		return
 	}
@@ -49,13 +48,8 @@ func GetRentById(c *gin.Context) {
 }
 
 func CreateRent(c *gin.Context) {
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.RequireAuthentication(c, "basic")
 	if !authenticated {
-		return
-	}
-
-	if userRole != "basic" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create rent"})
 		return
 	}
 
@@ -97,13 +91,8 @@ func CreateRent(c *gin.Context) {
 
 func UpdateRentById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
-		return
-	}
-
-	if userRole != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create rent"})
 		return
 	}
 
@@ -186,7 +175,7 @@ func UpdateRentById(c *gin.Context) {
 func DeleteRentById(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, _, authenticated := handlers.RequireAuthentication(c, "")
 	if !authenticated {
 		return
 	}

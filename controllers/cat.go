@@ -30,6 +30,7 @@ func CreateCat(c *gin.Context) {
 	userID, userRole, authenticated := handlers.CheckAuthentication(c)
 
 	if !authenticated {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -64,6 +65,7 @@ func UpdateCatById(c *gin.Context) {
 	// Check if the user is authenticated
 	userID, _, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
 
@@ -104,6 +106,7 @@ func DeleteCatById(c *gin.Context) {
 	// Check if the user is authenticated
 	userID, _, authenticated := handlers.CheckAuthentication(c)
 	if !authenticated {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return
 	}
 

@@ -28,8 +28,7 @@ func GetPostById(c *gin.Context) {
 	// Find the post by ID
 	// result := models.DB.First(&post, postId)
 	// Find the post by ID and preload its associated images
-	result := models.DB.Preload("Images").Preload("Reviews").First(&post, postId)
-	if result.Error != nil {
+	if result := models.DB.Preload("Images").Preload("Reviews").First(&post, postId).Error; result != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
 	}
@@ -40,13 +39,8 @@ func GetPostById(c *gin.Context) {
 func CreatePost(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
-		return
-	}
-
-	if userRole != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create post"})
 		return
 	}
 
@@ -99,7 +93,7 @@ func CreatePost(c *gin.Context) {
 
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}
@@ -176,15 +170,14 @@ func UpdatePostById(c *gin.Context) {
 func DeletePostById(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
+	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}
 
 	postId := c.Param("post_id")
 	var post models.Post
-	result := models.DB.First(&post, postId)
-	if result.Error != nil {
+	if result := models.DB.First(&post, postId).Error; result != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
 	}

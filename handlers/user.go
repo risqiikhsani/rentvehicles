@@ -11,7 +11,6 @@ func CheckAuthentication(c *gin.Context) (uint, string, bool) {
 	authenticated := false
 
 	if !a || !b {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
 		return 0, "", false
 	}
 
@@ -20,4 +19,19 @@ func CheckAuthentication(c *gin.Context) (uint, string, bool) {
 	authenticated = true
 
 	return userID, userRole, authenticated
+}
+
+func RequireAuthentication(c *gin.Context, requiredRole string) (uint, string, bool) {
+	userID, userRole, authenticated := CheckAuthentication(c)
+	if !authenticated {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return 0, "", false
+	}
+
+	if requiredRole != "" && userRole != requiredRole {
+		c.JSON(401, gin.H{"error": "You do not have permission"})
+		return 0, "", false
+	}
+
+	return userID, userRole, true
 }

@@ -39,7 +39,7 @@ func GetPostById(c *gin.Context) {
 func CreatePost(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}
@@ -93,7 +93,7 @@ func CreatePost(c *gin.Context) {
 
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}
@@ -170,7 +170,7 @@ func UpdatePostById(c *gin.Context) {
 func DeletePostById(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, userRole, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
 	if !authenticated {
 		return
 	}

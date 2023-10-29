@@ -9,7 +9,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
-func GetCats(db models.CatDatabase) gin.HandlerFunc {
+func GetCats(db models.CatDatabase, auth handlers.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cats, err := db.GetCats()
 		if err != nil {
@@ -20,7 +20,7 @@ func GetCats(db models.CatDatabase) gin.HandlerFunc {
 	}
 }
 
-func GetCatById(db models.CatDatabase) gin.HandlerFunc {
+func GetCatById(db models.CatDatabase, auth handlers.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		catID := c.Param("cat_id")
 		cat, err := db.GetCatByID(catID)
@@ -32,15 +32,15 @@ func GetCatById(db models.CatDatabase) gin.HandlerFunc {
 	}
 }
 
-func CreateCat(db models.CatDatabase) gin.HandlerFunc {
+func CreateCat(db models.CatDatabase, auth handlers.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		userID, _, authenticated := auth.RequireAuthentication2(c, "")
 		if !authenticated {
 			return
 		}
 
 		var cat models.Cat
-		if err := c.ShouldBind(&cat); err != nil {
+		if err := c.ShouldBindJSON(&cat); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
@@ -63,10 +63,10 @@ func CreateCat(db models.CatDatabase) gin.HandlerFunc {
 	}
 }
 
-func UpdateCatById(db models.CatDatabase) gin.HandlerFunc {
+func UpdateCatById(db models.CatDatabase, auth handlers.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the user is authenticated
-		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		userID, _, authenticated := auth.RequireAuthentication2(c, "")
 		if !authenticated {
 			return
 		}
@@ -84,7 +84,7 @@ func UpdateCatById(db models.CatDatabase) gin.HandlerFunc {
 			return
 		}
 
-		if err := c.ShouldBind(&existingCat); err != nil {
+		if err := c.ShouldBindJSON(&existingCat); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
@@ -106,10 +106,10 @@ func UpdateCatById(db models.CatDatabase) gin.HandlerFunc {
 	}
 }
 
-func DeleteCatById(db models.CatDatabase) gin.HandlerFunc {
+func DeleteCatById(db models.CatDatabase, auth handlers.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the user is authenticated
-		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		userID, _, authenticated := auth.RequireAuthentication2(c, "")
 		if !authenticated {
 			return
 		}

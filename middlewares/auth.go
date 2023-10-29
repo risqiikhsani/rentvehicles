@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,8 +13,6 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	jwtSecretString := configs.GetSecretConfig().SecretKey
 	jwtSecret := []byte(jwtSecretString)
-
-	fmt.Println("jwtsecret = " + jwtSecretString)
 
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")

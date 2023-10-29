@@ -9,29 +9,16 @@
 [GIN-debug] POST   /api/register             --> github.com/risqiikhsani/rentvehicles/controllers.Register (4 handlers)
 [GIN-debug] POST   /api/register-admin       --> github.com/risqiikhsani/rentvehicles/controllers.RegisterAdmin (4 handlers)
 [GIN-debug] POST   /api/login                --> github.com/risqiikhsani/rentvehicles/controllers.Login (4 handlers)
-[GIN-debug] GET    /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.GetUsers (6 handlers)
-[GIN-debug] GET    /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetUserById (6 handlers)
-[GIN-debug] PUT    /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdateUserById (6 handlers)
-[GIN-debug] DELETE /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeleteUserById (6 handlers)
-[GIN-debug] POST   /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.CreateUser (6 handlers)
-[GIN-debug] PUT    /api/account              --> github.com/risqiikhsani/rentvehicles/controllers.UpdateAccount (5 handlers)
-[GIN-debug] GET    /api/account              --> github.com/risqiikhsani/rentvehicles/controllers.GetAccount (5 handlers)
-[GIN-debug] GET    /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.GetPosts (6 handlers)
-[GIN-debug] GET    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetPostById (6 handlers)
-[GIN-debug] PUT    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdatePostById (6 handlers)
-[GIN-debug] DELETE /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeletePostById (6 handlers)
-[GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.CreatePost (6 handlers)
-[GIN-debug] POST   /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.CreateLocation (6 handlers)
-[GIN-debug] GET    /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.GetLocations (6 handlers)
-[GIN-debug] GET    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.GetLocationById (6 handlers)
-[GIN-debug] PUT    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.UpdateLocationById (6 handlers)
-[GIN-debug] DELETE /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.DeleteLocationById (6 handlers)
-[GIN-debug] POST   /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.CreateCat (6 handlers)
-[GIN-debug] GET    /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.GetCats (6 handlers)
-[GIN-debug] GET    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.GetCatById (6 handlers)
-[GIN-debug] PUT    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.UpdateCatById (6 handlers)
-[GIN-debug] DELETE /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.DeleteCatById (6 handlers)
+[GIN-debug] POST   /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.CreateCat.func1 (5 handlers)
+[GIN-debug] GET    /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.GetCats.func1 (5 handlers)
+[GIN-debug] GET    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.GetCatById.func1 (5 handlers)
+[GIN-debug] PUT    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.UpdateCatById.func1 (5 handlers)
+[GIN-debug] DELETE /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.DeleteCatById.func1 (5 handlers)
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/10/26 - 17:33:51 | 200 |     86.3894ms |             ::1 | POST     "/api/login"
+[GIN] 2023/10/29 - 15:34:10 | 200 |     12.9376ms |             ::1 | GET      "/api/cats"
+[GIN] 2023/10/29 - 15:35:09 | 401 |      1.5281ms |             ::1 | POST     "/api/cats"
+[GIN] 2023/10/29 - 15:35:16 | 400 |      1.5611ms |             ::1 | POST     "/api/cats"
+[GIN] 2023/10/29 - 15:35:46 | 201 |     23.6576ms |             ::1 | POST     "/api/cats"
+[GIN] 2023/10/29 - 15:35:50 | 200 |    139.1893ms |             ::1 | GET      "/api/cats"

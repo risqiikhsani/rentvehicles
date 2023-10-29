@@ -9,121 +9,130 @@ import (
 	"github.com/risqiikhsani/rentvehicles/utils"
 )
 
-func GetCats(c *gin.Context) {
-	var cats []models.Cat
-	models.DB.Preload("Images").Find(&cats)
-	c.JSON(200, cats)
+func GetCats(db models.CatDatabase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cats, err := db.GetCats()
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Cats not found"})
+			return
+		}
+		c.JSON(http.StatusOK, cats)
+	}
 }
 
-func GetCatById(c *gin.Context) {
-	catId := c.Param("cat_id")
-	var cat models.Cat
-	result := models.DB.Preload("Images").First(&cat, catId)
-
-	if result.Error != nil {
-		c.JSON(404, gin.H{"error": "Location not found"})
+func GetCatById(db models.CatDatabase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		catID := c.Param("cat_id")
+		cat, err := db.GetCatByID(catID)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Cat not found"})
+			return
+		}
+		c.JSON(http.StatusOK, cat)
 	}
-	c.JSON(200, cat)
 }
 
-func CreateCat(c *gin.Context) {
-	userID, userRole, authenticated := handlers.CheckAuthentication(c)
+func CreateCat(db models.CatDatabase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		if !authenticated {
+			return
+		}
 
-	if !authenticated {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
+		var cat models.Cat
+		if err := c.ShouldBind(&cat); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := utils.Validate.Struct(cat); err != nil {
+			errs := utils.TranslateError(err, utils.En)
+			c.JSON(400, gin.H{"errors": errs})
+			return
+		}
+
+		cat.UserID = userID
+		// Create the cat in the database
+		err := db.CreateCat(&cat)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to create cat"})
+			return
+		}
+
+		c.JSON(201, cat)
 	}
-
-	if userRole != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to create cat"})
-		return
-	}
-
-	var cat models.Cat
-	if err := c.ShouldBind(&cat); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := utils.Validate.Struct(cat); err != nil {
-		errs := utils.TranslateError(err, utils.En)
-		c.JSON(400, gin.H{"errors": errs})
-		return
-	}
-
-	cat.UserID = userID
-	// Create the cat in the database
-	if err := models.DB.Create(&cat).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to create comment"})
-		return
-	}
-	c.JSON(201, cat)
-
 }
 
-func UpdateCatById(c *gin.Context) {
-	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
-	if !authenticated {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
+func UpdateCatById(db models.CatDatabase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check if the user is authenticated
+		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		if !authenticated {
+			return
+		}
+
+		catId := c.Param("cat_id")
+
+		existingCat, err := db.GetCatByID(catId)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Cat not found"})
+			return
+		}
+		// Check if the user is the owner of the cat
+		if existingCat.UserID != userID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this cat"})
+			return
+		}
+
+		if err := c.ShouldBind(&existingCat); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := utils.Validate.Struct(existingCat); err != nil {
+			errs := utils.TranslateError(err, utils.En)
+			c.JSON(400, gin.H{"errors": errs})
+			return
+		}
+
+		err = db.UpdateCat(existingCat)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cat"})
+			return
+		}
+
+		c.JSON(http.StatusOK, existingCat)
+
 	}
-
-	catId := c.Param("cat_id")
-	var existingCat models.Cat
-	if err := models.DB.Where("id = ?", catId).First(&existingCat).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cat not found"})
-		return
-	}
-
-	// Check if the user is the owner of the cat
-	if existingCat.UserID != userID {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this cat"})
-		return
-	}
-
-	if err := c.ShouldBind(&existingCat); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := utils.Validate.Struct(existingCat); err != nil {
-		errs := utils.TranslateError(err, utils.En)
-		c.JSON(400, gin.H{"errors": errs})
-		return
-	}
-
-	if err := models.DB.Save(&existingCat).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cat"})
-		return
-	}
-
-	c.JSON(http.StatusOK, existingCat)
-
 }
 
-func DeleteCatById(c *gin.Context) {
-	// Check if the user is authenticated
-	userID, _, authenticated := handlers.CheckAuthentication(c)
-	if !authenticated {
-		c.JSON(401, gin.H{"error": "Unauthorized"})
-		return
+func DeleteCatById(db models.CatDatabase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check if the user is authenticated
+		userID, _, authenticated := handlers.RequireAuthentication(c, "")
+		if !authenticated {
+			return
+		}
+
+		catId := c.Param("cat_id")
+
+		existingCat, err := db.GetCatByID(catId)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Cat not found"})
+			return
+		}
+
+		if existingCat.UserID != userID {
+			c.JSON(403, gin.H{"error": "Not authorized to delete this cat"})
+			return
+		}
+
+		err = db.DeleteCat(existingCat)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete cat"})
+			return
+		}
+
+		c.JSON(204, nil)
 	}
-
-	catId := c.Param("cat_id")
-	var cat models.Cat
-	result := models.DB.First(&cat, catId)
-	if result.Error != nil {
-		c.JSON(404, gin.H{"error": "Comment not found"})
-		return
-	}
-
-	if cat.UserID != userID {
-		c.JSON(403, gin.H{"error": "Not authorized to delete this cat"})
-		return
-	}
-
-	models.DB.Delete(&cat)
-
-	c.JSON(204, nil)
 }

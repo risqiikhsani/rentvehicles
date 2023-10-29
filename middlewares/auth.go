@@ -1,18 +1,22 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/risqiikhsani/rentvehicles/configs"
 )
-
-var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
 
 // Middleware to verify JWT token
 func AuthMiddleware() gin.HandlerFunc {
+	jwtSecretString := configs.GetSecretConfig().SecretKey
+	jwtSecret := []byte(jwtSecretString)
+
+	fmt.Println("jwtsecret = " + jwtSecretString)
+
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" {
@@ -32,19 +36,40 @@ func AuthMiddleware() gin.HandlerFunc {
 			return jwtSecret, nil
 		})
 
-		if err != nil || !token.Valid {
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token parsing error: " + err.Error()})
+			c.Abort()
+			return
+		}
+
+		if !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
 
-		claims := token.Claims.(jwt.MapClaims)
-		// authenticated := claims["authenticated"].(bool)
-		userID := uint(claims["user_id"].(float64))
-		userRole := claims["user_role"].(string)
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
 
-		// c.Set("authenticated", authenticated)
-		c.Set("userID", userID)
+		userID, ok := claims["user_id"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in token"})
+			c.Abort()
+			return
+		}
+
+		userRole, ok := claims["user_role"].(string)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user role in token"})
+			c.Abort()
+			return
+		}
+
+		c.Set("userID", uint(userID))
 		c.Set("userRole", userRole)
 
 		c.Next()

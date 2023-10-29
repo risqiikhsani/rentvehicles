@@ -62,17 +62,21 @@ func main() {
 	static_path := appConfig.StaticPath
 	r.Static("/static", "./"+static_path)
 
-	models.ConnectDB(secretConfig)
+	// Create an instance of the database
+	dbInstance, err := models.ConnectDB(secretConfig) // Use your models package function
+	if err != nil {
+		// Handle the error
+		panic(err)
+	}
 
 	public := r.Group("/api")
 	public.Use(middlewares.LogMiddleware())
-	routes.SetupPublicAccountRoutes(public)  // in front of auth middleware so it's not using auth middleware (jwt token not required)
-	public.Use(middlewares.AuthMiddleware()) // will apply to all routes below
+	routes.SetupPublicAccountRoutes(public)
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)
 	routes.SetupPostRoutes(public)
 	routes.SetupLocationRoutes(public)
-	routes.SetupCatRoutes(public)
+	routes.SetupCatRoutes(public, dbInstance)
 
 	addr := fmt.Sprintf(":%s", serverPort)
 	if err := r.Run(addr); err != nil {

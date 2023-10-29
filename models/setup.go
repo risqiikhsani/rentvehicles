@@ -11,9 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type MyDatabase struct {
+	*gorm.DB
+}
+
 var DB *gorm.DB
 
-func ConnectDB(secretConf configs.SecretsConfig) {
+func ConnectDB(secretConf configs.SecretsConfig) (*MyDatabase, error) {
 
 	dbHost := secretConf.PostgresHost
 	dbPort := secretConf.PostgresPort
@@ -35,8 +39,7 @@ func ConnectDB(secretConf configs.SecretsConfig) {
 	})
 
 	if err != nil {
-		log.Fatal("connection error:", err)
-		panic("Failed to connect to the database")
+		return nil, err
 	}
 
 	// Perform database operations here
@@ -90,6 +93,8 @@ func ConnectDB(secretConf configs.SecretsConfig) {
 	fmt.Println("Connected to PostgreSQL database")
 
 	DB = db
+
+	return &MyDatabase{db}, nil
 
 }
 

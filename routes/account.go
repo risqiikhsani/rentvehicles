@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/controllers"
+	"github.com/risqiikhsani/rentvehicles/middlewares"
 )
 
 func SetupPublicAccountRoutes(public *gin.RouterGroup) {
@@ -13,6 +14,10 @@ func SetupPublicAccountRoutes(public *gin.RouterGroup) {
 }
 
 func SetupAccountRoutes(public *gin.RouterGroup) {
-	public.PUT("/account", controllers.UpdateAccount) // done test
-	public.GET("/account", controllers.GetAccount)    // done test
+	accountGroup := public.Group("/account")
+	accountGroup.Use(middlewares.AuthMiddleware())
+	{
+		public.PUT("", controllers.UpdateAccount) // done test
+		public.GET("", controllers.GetAccount)    // done test
+	}
 }

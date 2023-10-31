@@ -31,13 +31,12 @@
 [GIN-debug] GET    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.GetCatById.func1 (5 handlers)
 [GIN-debug] PUT    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.UpdateCatById.func1 (5 handlers)
 [GIN-debug] DELETE /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.DeleteCatById.func1 (5 handlers)
+[GIN-debug] GET    /api/rents                --> github.com/risqiikhsani/rentvehicles/controllers.GetRents (5 handlers)
+[GIN-debug] GET    /api/rents/:rent_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetRentById (5 handlers)
+[GIN-debug] PUT    /api/rents/:rent_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdateRentById (5 handlers)
+[GIN-debug] POST   /api/rents                --> github.com/risqiikhsani/rentvehicles/controllers.CreateRent (5 handlers)
+[GIN-debug] POST   /api/rents/:rent_id/cancel -->  (5 handlers)
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/10/29 - 19:53:03 | 200 |      7.7397ms |             ::1 | GET      "/api/cats"
-[GIN] 2023/10/29 - 19:53:06 | 400 |       1.609ms |             ::1 | POST     "/api/cats"
-[GIN] 2023/10/29 - 19:53:14 | 201 |     54.0683ms |             ::1 | POST     "/api/cats"
-[GIN] 2023/10/29 - 19:53:29 | 200 |     12.0281ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/10/29 - 19:53:40 | 200 |     12.6567ms |             ::1 | GET      "/api/posts"
-[GIN] 2023/10/29 - 19:53:49 | 201 |    143.5157ms |             ::1 | POST     "/api/posts"
-[GIN] 2023/10/29 - 19:53:53 | 200 |      17.841ms |             ::1 | GET      "/api/posts"
+[GIN] 2023/10/31 - 14:31:02 | 200 |    6.093739ms |             ::1 | GET      "/api/rents"

@@ -77,6 +77,7 @@ func main() {
 	routes.SetupPostRoutes(public)
 	routes.SetupLocationRoutes(public)
 	routes.SetupCatRoutes(public, dbInstance)
+	routes.SetupRentRoutes(public)
 
 	addr := fmt.Sprintf(":%s", serverPort)
 	if err := r.Run(addr); err != nil {

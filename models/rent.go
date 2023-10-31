@@ -34,8 +34,8 @@ func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 		return err
 	}
 	// If post.Units is zero or post.Available is false, cancel the creation of rent
-	if post.Units == 0 || !post.Available {
-		return fmt.Errorf("Cannot create Rent, Item is not available")
+	if post.Units < 1 || !post.Available {
+		return fmt.Errorf("cannot create Rent, item is not available")
 	}
 
 	return nil

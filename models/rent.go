@@ -9,17 +9,28 @@ import (
 
 type Rent struct {
 	gorm.Model
-	Text         string    `json:"text" form:"text"`
-	UserID       uint      `json:"user_id" form:"user_id" validate:"required"`
-	PostID       uint      `json:"post_id" form:"post_id" validate:"required"`
-	StartDate    time.Time `json:"start_date" form:"start_date" validate:"required"`
-	EndDate      time.Time `json:"end_date" form:"end_date" validate:"required,gtfield=StartDate"`
-	PickupDate   time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
-	ReturnDate   time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
-	LicensePlate string    `json:"license_plate" form:"license_plate"`
-	Status       string    `json:"status" form:"status" gorm:"default:'ReadyToPickup'"`
-	Images       []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+
+	UserID    uint      `json:"user_id" form:"user_id" validate:"required"`
+	PostID    uint      `json:"post_id" form:"post_id" validate:"required"`
+	StartDate time.Time `json:"start_date" form:"start_date" validate:"required"`
+	EndDate   time.Time `json:"end_date" form:"end_date" validate:"required,gtfield=StartDate"`
+	// PickupDate    time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
+	// ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
+	// Status        string  `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'Cancelled', 'OnGoing','Done');default:'ReadyToPickup'"`
+	// Images        []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	PaymentMethod string
+	IsCancelled   bool
 	// Other fields
+}
+
+type RentDetail struct {
+	gorm.Model
+	RentID     uint
+	PickupDate time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
+	ReturnDate time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
+	Status     string    `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'OnGoing','Done');default:'ReadyToPickup'"`
+	Images     []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Text       string    `json:"text" form:"text"`
 }
 
 // Cancelled

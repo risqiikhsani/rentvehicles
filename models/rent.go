@@ -20,6 +20,7 @@ type Rent struct {
 	// Images        []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	PaymentMethod string
 	IsCancelled   bool
+	RentDetail    RentDetail
 	// Other fields
 }
 
@@ -66,6 +67,15 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 
 	// Update the Post model in the database
 	if err := tx.Save(&post).Error; err != nil {
+		return err
+	}
+
+	// Create a RentDetail associated with this Rent
+	rentDetail := RentDetail{
+		RentID: rent.ID,
+	}
+
+	if err := tx.Create(&rentDetail).Error; err != nil {
 		return err
 	}
 

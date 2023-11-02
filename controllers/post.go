@@ -28,7 +28,7 @@ func GetPostById(c *gin.Context) {
 	// Find the post by ID
 	// result := models.DB.First(&post, postId)
 	// Find the post by ID and preload its associated images
-	if result := models.DB.Preload("Images").Preload("Reviews").First(&post, postId).Error; result != nil {
+	if result := models.DB.Preload("Images").Preload("MainImage").First(&post, postId).Error; result != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
 	}
@@ -80,10 +80,17 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	files := form.File["files"]
+	image := form.File["image"]
+	images := form.File["images"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadPostImages(c, &post.ID, files); err != nil {
+	if err := handlers.UploadMainPostImage(c, &post.ID, image[0]); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Handle file uploads and create image records
+	if err := handlers.UploadPostImages(c, &post.ID, images); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -154,6 +161,14 @@ func UpdatePostById(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete images"})
 			return
 		}
+	}
+
+	image := form.File["image"]
+
+	// Handle file uploads and create image records
+	if err := handlers.UploadMainPostImage(c, &existingPost.ID, image[0]); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 
 	files := form.File["files"]

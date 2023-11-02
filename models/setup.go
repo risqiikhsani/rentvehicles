@@ -68,6 +68,9 @@ func ConnectDB(secretConf configs.SecretsConfig) (*MyDatabase, error) {
 	if err := autoMigrateModel(db, &Rent{}); err != nil {
 		log.Fatalf("Error migrating Rent: %v", err)
 	}
+	if err := autoMigrateModel(db, &RentDetail{}); err != nil {
+		log.Fatalf("Error migrating RentDetail: %v", err)
+	}
 	if err := autoMigrateModel(db, &Image{}); err != nil {
 		log.Fatalf("Error migrating Image: %v", err)
 	}

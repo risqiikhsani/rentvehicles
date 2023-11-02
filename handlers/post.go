@@ -69,3 +69,44 @@ func UploadPostImages(c *gin.Context, postID *uint, files []*multipart.FileHeade
 	}
 	return nil
 }
+
+func UploadMainPostImage(c *gin.Context, postID *uint, fileHeader *multipart.FileHeader) error {
+	// Check if the post with the provided postID exists
+	var post models.Post
+	if err := models.DB.First(&post, postID).Error; err != nil {
+		return err
+	}
+
+	// Get the file name and path
+	// filename := filepath.Base(fileHeader.Filename)
+
+	// Generate a random string for the file name
+	randomString := utils.RandomStringUuid()
+
+	// Get the file extension from the original file name
+	fileExt := filepath.Ext(fileHeader.Filename)
+
+	// Create a unique file name by combining the random string and the file extension
+	filename := randomString + fileExt
+	filePath := filepath.Join("static/images", filename)
+
+	// Save the uploaded file to the specified path
+	if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
+		return err
+	}
+
+	// Assuming you want to store the file path in the database,
+	// you can create an Image model and store the filePath in it.
+	// Here's a simplified example:
+
+	image := models.Image{
+		Path:       filePath,
+		MainPostID: postID, // Link the image to the post
+	}
+
+	if err := models.DB.Create(&image).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

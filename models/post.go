@@ -22,10 +22,10 @@ type Post struct {
 	PricePerMonth uint   `json:"price_per_month" form:"price_per_month"  validate:"required,numeric"`
 	Discount      uint   `json:"discount" form:"discount" `
 	// Units         uint     `gorm:"default:1" json:"units" form:"units"  validate:"required,numeric"`
-	Bookable     bool    `gorm:"default:true" json:"bookable" form:"bookable" `
+	Bookable     *bool   `gorm:"default:true" json:"bookable" form:"bookable" validate:"boolean"`
 	BodyColor    string  `json:"body_color" form:"body_color" `
 	LicensePlate string  `json:"license_plate" form:"license_plate" `
-	Available    bool    `json:"available" form:"available" gorm:"default:true"`
+	Available    *bool   `gorm:"default:true" json:"available" form:"available" validate:"boolean"`
 	UserID       uint    `validate:"required,numeric"`
 	MainImage    Image   `gorm:"foreignKey:MainPostID"`
 	Images       []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // One-to-many relationship with images

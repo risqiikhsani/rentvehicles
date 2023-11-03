@@ -18,7 +18,7 @@ type Rent struct {
 	// ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
 	// Status        string  `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'Cancelled', 'OnGoing','Done');default:'ReadyToPickup'"`
 	PaymentMethod string
-	IsCancelled   bool   `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
+	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
 	RentDetail    RentDetail
 	// Other fields
@@ -48,7 +48,14 @@ func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 		return err
 	}
 
-	if !post.Available {
+	// The error message you're encountering, "invalid operation: operator ! not defined on post.Available (variable of type *bool),"
+	// is because the Available field in your Post model is a pointer to a boolean (*bool), and you cannot directly apply the logical NOT (!) operator to a pointer.
+	// if !post.Available {
+	// 	return fmt.Errorf("Post is not available!")
+	// }
+
+	// Check if 'post.Available' is not nil and is set to 'false'
+	if post.Available != nil && !*post.Available {
 		return fmt.Errorf("Post is not available!")
 	}
 

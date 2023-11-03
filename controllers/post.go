@@ -7,6 +7,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
+	"gorm.io/gorm/clause"
 )
 
 // Implement other route handlers similarly
@@ -15,7 +16,7 @@ func GetPosts(c *gin.Context) {
 	// Find all posts
 	// models.DB.Find(&posts)
 	// Find all posts and preload their associated images
-	models.DB.Preload("Images").Find(&posts)
+	models.DB.Preload(clause.Associations).Find(&posts)
 
 	c.JSON(200, posts)
 }
@@ -28,7 +29,7 @@ func GetPostById(c *gin.Context) {
 	// Find the post by ID
 	// result := models.DB.First(&post, postId)
 	// Find the post by ID and preload its associated images
-	if result := models.DB.Preload("Images").Preload("MainImage").First(&post, postId).Error; result != nil {
+	if result := models.DB.Preload(clause.Associations).First(&post, postId).Error; result != nil {
 		c.JSON(404, gin.H{"error": "Post not found"})
 		return
 	}
@@ -80,11 +81,11 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	image := form.File["image"]
+	main_image := form.File["main_image"]
 	images := form.File["images"]
 
 	// Handle file uploads and create image records
-	if err := handlers.UploadMainPostImage(c, &post.ID, image[0]); err != nil {
+	if err := handlers.UploadMainPostImage(c, &post.ID, main_image[0]); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -163,18 +164,16 @@ func UpdatePostById(c *gin.Context) {
 		}
 	}
 
-	image := form.File["image"]
-
-	// Handle file uploads and create image records
-	if err := handlers.UploadMainPostImage(c, &existingPost.ID, image[0]); err != nil {
+	main_image := form.File["main_image"]
+	images := form.File["images"]
+	// Handle file uploads and create main_image records
+	if err := handlers.UploadMainPostImage(c, &existingPost.ID, main_image[0]); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	files := form.File["files"]
-
 	// Handle file uploads and create image records
-	if err := handlers.UploadPostImages(c, &existingPost.ID, files); err != nil {
+	if err := handlers.UploadPostImages(c, &existingPost.ID, images); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

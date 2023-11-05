@@ -11,16 +11,19 @@ import (
 
 type Post struct {
 	gorm.Model
-	Brand         string `json:"brand" form:"brand"  validate:"required"`
-	BrandModel    string `json:"brand_model" form:"brand_model"  validate:"required"`
-	VehicleType   string `json:"vehicle_type" form:"vehicle_type"  validate:"required"`
-	Year          uint   `json:"year" form:"year"  validate:"required,numeric"`
-	Transmission  string `json:"transmission" form:"transmission"  validate:"required"`
-	FuelType      string `json:"fuel_type" form:"fuel_type"  validate:"required"`
-	PricePerDay   uint   `json:"price_per_day" form:"price_per_day"  validate:"required,numeric"`
-	PricePerWeek  uint   `json:"price_per_week" form:"price_per_week"  validate:"required,numeric"`
-	PricePerMonth uint   `json:"price_per_month" form:"price_per_month"  validate:"required,numeric"`
-	Discount      uint   `json:"discount" form:"discount" `
+	Brand                      string `json:"brand" form:"brand"  validate:"required"`
+	BrandModel                 string `json:"brand_model" form:"brand_model"  validate:"required"`
+	VehicleType                string `json:"vehicle_type" form:"vehicle_type"  validate:"required"`
+	Year                       uint   `json:"year" form:"year"  validate:"required,numeric"`
+	Transmission               string `json:"transmission" form:"transmission"  validate:"required"`
+	FuelType                   string `json:"fuel_type" form:"fuel_type"  validate:"required"`
+	PricePerDay                uint   `json:"price_per_day" form:"price_per_day"  validate:"required,numeric"`
+	PricePerWeek               uint   `json:"price_per_week" form:"price_per_week"  validate:"required,numeric"`
+	PricePerMonth              uint   `json:"price_per_month" form:"price_per_month"  validate:"required,numeric"`
+	PricePerDayAfterDiscount   uint   `json:"price_per_day_after_discount" form:"price_per_day_after_discount" `
+	PricePerWeekAfterDiscount  uint   `json:"price_per_week_after_discount" form:"price_per_week_after_discount" `
+	PricePerMonthAfterDiscount uint   `json:"price_per_month_after_discount" form:"price_per_month_after_discount" `
+	DiscountPercentage         uint   `json:"discount" form:"discount" `
 	// Units         uint     `gorm:"default:1" json:"units" form:"units"  validate:"required,numeric"`
 	Bookable     *bool   `gorm:"default:true" json:"bookable" form:"bookable" validate:"boolean"`
 	BodyColor    string  `json:"body_color" form:"body_color" `
@@ -97,6 +100,17 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 
 // 	return
 // }
+
+func (post *Post) BeforeSave(tx *gorm.DB) (err error) {
+
+	if post.DiscountPercentage != 0 {
+		post.PricePerDayAfterDiscount = post.PricePerDay - (post.PricePerDay * post.DiscountPercentage / 100)
+		post.PricePerWeekAfterDiscount = post.PricePerWeek - (post.PricePerWeek * post.DiscountPercentage / 100)
+		post.PricePerMonthAfterDiscount = post.PricePerMonth - (post.PricePerMonth * post.DiscountPercentage / 100)
+	}
+
+	return nil
+}
 
 func (post *Post) AfterDelete(tx *gorm.DB) (err error) {
 	// First, fetch all associated images

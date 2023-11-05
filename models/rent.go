@@ -24,19 +24,26 @@ type Rent struct {
 	// Other fields
 }
 
+// payment method
+// paylater
+// pay in front
+
 type RentDetail struct {
 	gorm.Model
-	LicensePlate  string    `json:"license_plate" form:"license_plate"`
-	PickupDate    time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
-	ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
-	DeclineReason string    `json:"decline_reason" form:"decline_reason"`
-	Status        string    `json:"status" form:"status" gorm:"default:'ReadyToPickup'"`
-	Images        []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Text          string    `json:"text" form:"text"`
-	RentID        uint
+	LicensePlate   string    `json:"license_plate" form:"license_plate"`
+	PickupDate     time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
+	ReturnDate     time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
+	IsPaid         bool      `json:"is_paid" form:"is_paid" gorm:"default:false"`
+	EstimatedPrice uint      `json:"estimated_price" form:"estimated_price"`
+	DeclineReason  string    `json:"decline_reason" form:"decline_reason"`
+	Status         string    `json:"status" form:"status" gorm:"default:'ReadyToPickup'"`
+	Images         []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Text           string    `json:"text" form:"text"`
+	RentID         uint
 }
 
 // Declined
+// Accepted
 // ReadyToPickup
 // OnProgress
 // Done

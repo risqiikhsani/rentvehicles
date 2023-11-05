@@ -13,28 +13,24 @@ import (
 // Implement other route handlers similarly
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
-	// Find all posts
-	// models.DB.Find(&posts)
-	// Find all posts and preload their associated images
-	models.DB.Preload(clause.Associations).Find(&posts)
-
-	c.JSON(200, posts)
-}
-
-func GetPostById(c *gin.Context) {
-	postId := c.Param("post_id")
-
-	var post models.Post
-
-	// Find the post by ID
-	// result := models.DB.First(&post, postId)
-	// Find the post by ID and preload its associated images
-	if result := models.DB.Preload(clause.Associations).First(&post, postId).Error; result != nil {
-		c.JSON(404, gin.H{"error": "Post not found"})
+	if err := models.DB.Preload(clause.Associations).Find(&posts).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No posts found"})
 		return
 	}
 
-	c.JSON(200, post)
+	c.JSON(http.StatusOK, posts)
+}
+
+func GetPostById(c *gin.Context) {
+	postID := c.Param("post_id")
+	var post models.Post
+
+	if err := models.DB.Preload(clause.Associations).First(&post, postID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
 }
 
 func CreatePost(c *gin.Context) {
@@ -111,7 +107,7 @@ func UpdatePostById(c *gin.Context) {
 
 	// Check if the post exists
 	var existingPost models.Post
-	if err := models.DB.Preload("Images").Where("id = ?", postID).First(&existingPost).Error; err != nil {
+	if err := models.DB.Preload(clause.Associations).Where("id = ?", postID).First(&existingPost).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}

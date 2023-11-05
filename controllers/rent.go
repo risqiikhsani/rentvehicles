@@ -7,6 +7,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/handlers"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/utils"
+	"gorm.io/gorm/clause"
 )
 
 func GetRents(c *gin.Context) {
@@ -19,12 +20,12 @@ func GetRents(c *gin.Context) {
 
 	// if basic user , rents data will be the user's rents history
 	if userRole == "basic" {
-		models.DB.Where("user_id = ?", userID).Find(&rents)
+		models.DB.Preload(clause.Associations).Where("user_id = ?", userID).Find(&rents)
 		// if admin user, rents data will be the rents data which post_id is admin's
 	} else if userRole == "admin" {
 		// Assuming an admin can only see rents associated with their own posts.
 		subquery := models.DB.Model(&models.Post{}).Select("ID").Where("user_id = ?", userID)
-		models.DB.Where("post_id IN (?)", subquery).Find(&rents)
+		models.DB.Preload(clause.Associations).Where("post_id IN (?)", subquery).Find(&rents)
 	} else {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Permission denied"})
 		return
@@ -34,11 +35,16 @@ func GetRents(c *gin.Context) {
 }
 
 func GetRentById(c *gin.Context) {
+	_, _, authenticated := handlers.RequireAuthentication(c, "")
+	if !authenticated {
+		return
+	}
+
 	rent_id := c.Param("rent_id")
 
 	var rent models.Rent
 
-	result := models.DB.First(&rent, rent_id)
+	result := models.DB.Preload(clause.Associations).First(&rent, rent_id)
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Rent not found"})
 		return
@@ -67,18 +73,21 @@ func CreateRent(c *gin.Context) {
 		return
 	}
 
+	// do some checking in rent's hook
+
 	// Create the rent in the database
 	if err := models.DB.Create(&rent).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Something went wrong, Failed to create comment"})
 		return
 	}
+
 	c.JSON(201, rent)
 
 }
 
 func UpdateRentById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "basic")
 	if !authenticated {
 		return
 	}
@@ -100,14 +109,13 @@ func UpdateRentById(c *gin.Context) {
 		return
 	}
 
-	// only allow poster to update rent data
-	if associatedPost.UserID != userID {
+	// only allow rent maker to update rent data
+	if existingRent.UserID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this rent"})
 		return
 	}
 
 	// Update the text of the rent
-
 	if err := c.ShouldBindJSON(&existingRent); err != nil {
 		c.JSON(400, gin.H{"errors": err.Error()})
 		return
@@ -125,38 +133,4 @@ func UpdateRentById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, existingRent)
-}
-
-func DeleteRentById(c *gin.Context) {
-
-	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "")
-	if !authenticated {
-		return
-	}
-
-	rent_id := c.Param("rent_id")
-	var rent models.Rent
-	if err := models.DB.First(&rent, rent_id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Rent not found"})
-		return
-	}
-
-	// if associated post is not found , return error
-	var associatedPost models.Post
-	if err := models.DB.First(&associatedPost, rent.PostID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Associated post not found"})
-		return
-	}
-
-	// only customer or poster can delete rent data
-	if rent.UserID != userID || associatedPost.UserID != userID {
-		c.JSON(403, gin.H{"error": "Not authorized to delete this rent"})
-		return
-	}
-
-	// delete rent data
-	models.DB.Delete(&rent)
-
-	c.JSON(204, nil)
 }

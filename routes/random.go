@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var randomGroup *gin.Engine
-
 func Ping(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "pong",

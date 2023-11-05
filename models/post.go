@@ -76,24 +76,51 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 	return jsonString, nil
 }
 
+// func (post *Post) AfterDelete(tx *gorm.DB) (err error) {
+// 	// First, fetch all associated images
+// 	var images []Image
+// 	tx.Model(post).Association("Images").Find(&images)
+
+// 	// Delete each associated image
+// 	for _, image := range images {
+// 		tx.Unscoped().Delete(&image)
+// 	}
+
+// 	return
+// }
+
+// func (image *Image) BeforeDelete(tx *gorm.DB) (err error) {
+
+// 	if image.Path != "" {
+// 		os.Remove(image.Path)
+// 	}
+
+// 	return
+// }
+
 func (post *Post) AfterDelete(tx *gorm.DB) (err error) {
 	// First, fetch all associated images
 	var images []Image
-	tx.Model(post).Association("Images").Find(&images)
+	if err := tx.Model(post).Association("Images").Find(&images); err != nil {
+		return err
+	}
 
 	// Delete each associated image
 	for _, image := range images {
-		tx.Unscoped().Delete(&image)
+		if err := tx.Unscoped().Delete(&image).Error; err != nil {
+			return err
+		}
 	}
 
-	return
+	return nil
 }
 
 func (image *Image) BeforeDelete(tx *gorm.DB) (err error) {
-
 	if image.Path != "" {
-		os.Remove(image.Path)
+		if err := os.Remove(image.Path); err != nil {
+			return err
+		}
 	}
 
-	return
+	return nil
 }

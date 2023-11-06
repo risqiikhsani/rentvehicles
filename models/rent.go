@@ -17,9 +17,10 @@ type Rent struct {
 	// PickupDate    time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
 	// ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
 	// Status        string  `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'Cancelled', 'OnGoing','Done');default:'ReadyToPickup'"`
-	PaymentMethod string
+	PaymentMethod string `json:"payment_method" form:"payment_method" gorm:"default:'paylater'"`
 	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
+	DiscountCode  string `json:"discount_voucher" form:"discount_voucher"`
 	RentDetail    RentDetail
 	// Other fields
 }
@@ -30,16 +31,17 @@ type Rent struct {
 
 type RentDetail struct {
 	gorm.Model
-	LicensePlate   string    `json:"license_plate" form:"license_plate"`
-	PickupDate     time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
-	ReturnDate     time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
-	IsPaid         bool      `json:"is_paid" form:"is_paid" gorm:"default:false"`
-	EstimatedPrice uint      `json:"estimated_price" form:"estimated_price"`
-	DeclineReason  string    `json:"decline_reason" form:"decline_reason"`
-	Status         string    `json:"status" form:"status" gorm:"default:'ReadyToPickup'"`
-	Images         []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Text           string    `json:"text" form:"text"`
-	RentID         uint
+	LicensePlate        string    `json:"license_plate" form:"license_plate"`
+	PickupDate          time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
+	ReturnDate          time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
+	IsPaid              bool      `json:"is_paid" form:"is_paid" gorm:"default:false"`
+	EstimatedPrice      uint      `json:"estimated_price" form:"estimated_price"`
+	EstimatedSavedPrice int       `json:"estimated_saved_price" form:"estimated_saved_price"`
+	DeclineReason       string    `json:"decline_reason" form:"decline_reason"`
+	Status              string    `json:"status" form:"status" gorm:"default:'Accepted'"`
+	Images              []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Text                string    `json:"text" form:"text"`
+	RentID              uint
 }
 
 // Declined
@@ -47,6 +49,16 @@ type RentDetail struct {
 // ReadyToPickup
 // OnProgress
 // Done
+
+func (rent *Rent) CalculateTotalDays() int {
+	// Calculate the duration between the StartDate and EndDate
+	duration := rent.EndDate.Sub(rent.StartDate)
+
+	// Extract the total number of days from the duration
+	totalDays := int(duration.Hours() / 24)
+
+	return totalDays
+}
 
 func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 	// Fetch the associated Post model by ID
@@ -71,27 +83,63 @@ func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 	// Fetch the associated Post model by ID
-	// var post Post
-	// if err := tx.First(&post, rent.PostID).Error; err != nil {
-	// 	return err
-	// }
+	var post Post
+	if err := tx.First(&post, rent.PostID).Error; err != nil {
+		return err
+	}
 
-	// Calculate the updated values
-	// remainingUnits := uint(post.Units) - 1
-	// post.Units = uint(remainingUnits)
-	// post.Available = remainingUnits > 0
+	*post.Available = false
 
-	// Update the Post model in the database
-	// if err := tx.Save(&post).Error; err != nil {
-	// 	return err
-	// }
+	if err := tx.Save(&post).Error; err != nil {
+		return err
+	}
 
+	totalDays := rent.CalculateTotalDays()
+	estimatedPrice, savedPrice, _ := post.CalculateRentalPrice(uint(totalDays))
 	// Create a RentDetail associated with this Rent
 	rentDetail := RentDetail{
-		RentID: rent.ID,
+		RentID:              rent.ID,
+		EstimatedPrice:      estimatedPrice,
+		EstimatedSavedPrice: savedPrice,
 	}
 
 	if err := tx.Create(&rentDetail).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
+
+	var rent Rent
+	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+		return err
+	}
+
+	if *rent.IsCancelled {
+		return fmt.Errorf("Rent was cancelled by consumer, can't update!")
+	}
+
+	return nil
+}
+
+func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
+	var rent Rent
+	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+		return err
+	}
+
+	var post Post
+	if err := tx.First(&post, rent.PostID).Error; err != nil {
+		return err
+	}
+
+	if rentDetail.Status == "Done" || rentDetail.Status == "Declined" {
+		*post.Available = true
+	}
+
+	if err := tx.Save(&post).Error; err != nil {
 		return err
 	}
 

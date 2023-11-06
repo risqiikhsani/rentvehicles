@@ -45,6 +45,50 @@ type Image struct {
 	MainPostID   *uint
 }
 
+func (post *Post) CalculateRentalPrice(rentDays uint) (uint, int, error) {
+	if rentDays == 0 {
+		return 0, 0, nil
+	}
+
+	// Calculate the total price based on rental duration
+	var totalPrice uint
+	var discountedPrice uint
+	savedPrice := 0
+
+	if rentDays >= 30 {
+		// Calculate the number of months and remaining days
+		months := rentDays / 30
+		remainingDays := rentDays % 30
+
+		// Calculate the total price
+		totalMonthlyPrice := months * post.PricePerMonth
+		totalDailyPrice := remainingDays * post.PricePerDay
+
+		totalPrice = totalMonthlyPrice + totalDailyPrice
+	} else if rentDays >= 7 {
+		// Calculate the number of weeks and remaining days
+		weeks := rentDays / 7
+		remainingDays := rentDays % 7
+
+		// Calculate the total price
+		totalWeeklyPrice := weeks * post.PricePerWeek
+		totalDailyPrice := remainingDays * post.PricePerDay
+
+		totalPrice = totalWeeklyPrice + totalDailyPrice
+	} else {
+		// If the rental duration is less than a week, charge the daily rate
+		totalPrice = rentDays * post.PricePerDay
+	}
+
+	if post.DiscountPercentage != 0 {
+		discountedPrice = totalPrice - (totalPrice * post.DiscountPercentage / 100)
+		savedPrice = int(totalPrice)
+		return discountedPrice, -savedPrice, nil
+	}
+
+	return totalPrice, -savedPrice, nil
+}
+
 var baseURL string
 var staticImagePath string
 

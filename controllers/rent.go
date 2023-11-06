@@ -47,7 +47,7 @@ func GetEstimateRentPrice(c *gin.Context) {
 		return
 	}
 
-	estimatedPrice, savedPrice, _ := CalculateRentalPrice(post, uint(rentDays), voucherCodeStr)
+	estimatedPrice, savedPrice, _ := post.CalculateRentalPrice(uint(rentDays))
 
 	c.JSON(http.StatusOK, gin.H{
 		"post_id":         postId,
@@ -56,52 +56,6 @@ func GetEstimateRentPrice(c *gin.Context) {
 		"estimated_price": estimatedPrice,
 		"saved_price":     savedPrice,
 	})
-}
-
-func CalculateRentalPrice(post models.Post, rentDays uint, voucherCode string) (uint, int, error) {
-	if rentDays == 0 {
-		return 0, 0, nil
-	}
-
-	// Calculate the total price based on rental duration
-	var totalPrice uint
-	var discountedPrice uint
-	savedPrice := 0
-
-	if rentDays >= 30 {
-		// Calculate the number of months and remaining days
-		months := rentDays / 30
-		remainingDays := rentDays % 30
-
-		// Calculate the total price
-		totalMonthlyPrice := months * post.PricePerMonth
-		totalDailyPrice := remainingDays * post.PricePerDay
-
-		totalPrice = totalMonthlyPrice + totalDailyPrice
-	} else if rentDays >= 7 {
-		// Calculate the number of weeks and remaining days
-		weeks := rentDays / 7
-		remainingDays := rentDays % 7
-
-		// Calculate the total price
-		totalWeeklyPrice := weeks * post.PricePerWeek
-		totalDailyPrice := remainingDays * post.PricePerDay
-
-		totalPrice = totalWeeklyPrice + totalDailyPrice
-	} else {
-		// If the rental duration is less than a week, charge the daily rate
-		totalPrice = rentDays * post.PricePerDay
-	}
-
-	voucherCode = ""
-
-	if post.DiscountPercentage != 0 {
-		discountedPrice = totalPrice - (totalPrice * post.DiscountPercentage / 100)
-		savedPrice = int(totalPrice)
-		return discountedPrice, savedPrice, nil
-	}
-
-	return totalPrice, savedPrice, nil
 }
 
 func GetRents(c *gin.Context) {

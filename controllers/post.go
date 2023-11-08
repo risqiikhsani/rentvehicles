@@ -169,10 +169,14 @@ func UpdatePostById(c *gin.Context) {
 
 	main_image := form.File["main_image"]
 	images := form.File["images"]
-	// Handle file uploads and create main_image records
-	if err := handlers.UploadMainPostImage(c, &existingPost.ID, main_image[0]); err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
+
+	// Check if main_image slice is not empty
+	if len(main_image) > 0 {
+		// Handle file uploads and create image records
+		if err := handlers.UploadMainPostImage(c, &existingPost.ID, main_image[0]); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	// Handle file uploads and create image records

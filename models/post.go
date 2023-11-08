@@ -23,7 +23,7 @@ type Post struct {
 	PricePerDayAfterDiscount   uint   `json:"price_per_day_after_discount" form:"price_per_day_after_discount" `
 	PricePerWeekAfterDiscount  uint   `json:"price_per_week_after_discount" form:"price_per_week_after_discount" `
 	PricePerMonthAfterDiscount uint   `json:"price_per_month_after_discount" form:"price_per_month_after_discount" `
-	DiscountPercentage         uint   `json:"discount" form:"discount" `
+	DiscountPercentage         uint   `json:"discount_percentage" form:"discount_percentage" `
 	// Units         uint     `gorm:"default:1" json:"units" form:"units"  validate:"required,numeric"`
 	Bookable     *bool   `gorm:"default:true" json:"bookable" form:"bookable"`
 	BodyColor    string  `json:"body_color" form:"body_color" `

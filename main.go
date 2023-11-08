@@ -70,6 +70,7 @@ func main() {
 	}
 
 	public := r.Group("/api")
+	public.Use(middlewares.AuthMiddleware())
 	public.Use(middlewares.LogMiddleware())
 	routes.SetupPublicAccountRoutes(public)
 	routes.SetupUserRoutes(public)

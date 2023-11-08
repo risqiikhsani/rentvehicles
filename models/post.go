@@ -25,10 +25,10 @@ type Post struct {
 	PricePerMonthAfterDiscount uint   `json:"price_per_month_after_discount" form:"price_per_month_after_discount" `
 	DiscountPercentage         uint   `json:"discount" form:"discount" `
 	// Units         uint     `gorm:"default:1" json:"units" form:"units"  validate:"required,numeric"`
-	Bookable     *bool   `gorm:"default:true" json:"bookable" form:"bookable" validate:"boolean"`
+	Bookable     *bool   `gorm:"default:true" json:"bookable" form:"bookable"`
 	BodyColor    string  `json:"body_color" form:"body_color" `
 	LicensePlate string  `json:"license_plate" form:"license_plate" `
-	Available    *bool   `gorm:"default:true" json:"available" form:"available" validate:"boolean"`
+	Available    *bool   `gorm:"default:true" json:"available" form:"available"`
 	UserID       uint    `validate:"required,numeric"`
 	MainImage    Image   `gorm:"foreignKey:MainPostID"`
 	Images       []Image `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // One-to-many relationship with images
@@ -146,6 +146,10 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 // }
 
 func (post *Post) BeforeSave(tx *gorm.DB) (err error) {
+
+	post.PricePerDayAfterDiscount = post.PricePerDay
+	post.PricePerWeekAfterDiscount = post.PricePerWeek
+	post.PricePerMonthAfterDiscount = post.PricePerMonth
 
 	if post.DiscountPercentage != 0 {
 		post.PricePerDayAfterDiscount = post.PricePerDay - (post.PricePerDay * post.DiscountPercentage / 100)

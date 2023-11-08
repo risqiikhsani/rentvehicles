@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -75,7 +75,8 @@ func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 
 	// Check if 'post.Available' is not nil and is set to 'false'
 	if post.Available != nil && !*post.Available {
-		return fmt.Errorf("Post is not available!")
+		err = errors.New("Post is not available")
+		return err
 	}
 
 	return nil
@@ -118,7 +119,8 @@ func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
 	}
 
 	if *rent.IsCancelled {
-		return fmt.Errorf("Rent was cancelled by consumer, can't update!")
+		err = errors.New("can't update, rent was cancelled")
+		return err
 	}
 
 	return nil

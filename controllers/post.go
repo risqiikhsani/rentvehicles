@@ -80,9 +80,16 @@ func CreatePost(c *gin.Context) {
 	main_image := form.File["main_image"]
 	images := form.File["images"]
 
-	// Handle file uploads and create image records
-	if err := handlers.UploadMainPostImage(c, &post.ID, main_image[0]); err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+	// Check if main_image slice is not empty
+	if len(main_image) > 0 {
+		// Handle file uploads and create image records
+		if err := handlers.UploadMainPostImage(c, &post.ID, main_image[0]); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+	} else {
+		// Handle the case when main_image is empty, e.g., return an error or take appropriate action.
+		c.JSON(400, gin.H{"error": "Main image is missing"})
 		return
 	}
 

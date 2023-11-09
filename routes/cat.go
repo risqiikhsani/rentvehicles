@@ -19,6 +19,7 @@ func SetupCatRoutes(public *gin.RouterGroup, dbinstance *models.MyDatabase) {
 
 	catGroup := public.Group("/cats")
 	catGroup.Use(middlewares.AuthMiddleware())
+	catGroup.Use(middlewares.LogMiddleware())
 	{
 		catGroup.POST("", controllers.CreateCat(db, auth))               // done test
 		catGroup.GET("", controllers.GetCats(db, auth))                  // done test

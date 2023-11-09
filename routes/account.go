@@ -16,6 +16,7 @@ func SetupPublicAccountRoutes(public *gin.RouterGroup) {
 func SetupAccountRoutes(public *gin.RouterGroup) {
 	accountGroup := public.Group("/account")
 	accountGroup.Use(middlewares.AuthMiddleware())
+	accountGroup.Use(middlewares.LogMiddleware())
 	{
 		public.PUT("", controllers.UpdateAccount) // done test
 		public.GET("", controllers.GetAccount)    // done test

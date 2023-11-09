@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	// "github.com/joho/godotenv"
 	"github.com/risqiikhsani/rentvehicles/configs"
-	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -52,6 +51,7 @@ func main() {
 
 	// Use the following code if you need to write the logs to file and console at the same time.
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	// logrus.SetOutput(io.MultiWriter(f, os.Stdout))
 
 	// utils.InitializeValidator()
 	r := gin.Default()
@@ -70,8 +70,8 @@ func main() {
 	}
 
 	public := r.Group("/api")
-	public.Use(middlewares.AuthMiddleware())
-	public.Use(middlewares.LogMiddleware())
+	// public.Use(middlewares.AuthMiddleware())
+	// public.Use(middlewares.LogMiddleware())
 	routes.SetupPublicAccountRoutes(public)
 	routes.SetupUserRoutes(public)
 	routes.SetupAccountRoutes(public)

@@ -9,6 +9,7 @@ import (
 func SetupRentRoutes(public *gin.RouterGroup) {
 	rentGroup := public.Group("/rents")
 	rentGroup.Use(middlewares.AuthMiddleware())
+	rentGroup.Use(middlewares.LogMiddleware())
 	{
 		rentGroup.GET("", controllers.GetRents)
 		rentGroup.GET("/:rent_id", controllers.GetRentById)

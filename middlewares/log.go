@@ -13,9 +13,19 @@ func LogMiddleware() gin.HandlerFunc {
 		start := time.Now()
 
 		// Log the request
+		userID, _ := c.Get("userID")
+		// clientIP := c.ClientIP() // Get client's IP address
+		clientIP := c.Request.RemoteAddr
+		requestHeaders := c.Request.Header
+		httpMethod := c.Request.Method
+		httpPath := c.Request.URL.Path
+
 		logrus.WithFields(logrus.Fields{
-			"method": c.Request.Method,
-			"path":   c.Request.URL.Path,
+			"method":         httpMethod,
+			"path":           httpPath,
+			"userID":         userID,
+			"clientIP":       clientIP,
+			"requestHeaders": requestHeaders,
 		}).Info("Request received")
 
 		// Continue handling the request
@@ -23,11 +33,20 @@ func LogMiddleware() gin.HandlerFunc {
 
 		// Log the response and request duration
 		latency := time.Since(start)
+
+		responseHeaders := c.Writer.Header()
+		httpStatus := c.Writer.Status()
+		responsePayload := c.Writer.Size()
+
 		logrus.WithFields(logrus.Fields{
-			"method":   c.Request.Method,
-			"path":     c.Request.URL.Path,
-			"status":   c.Writer.Status(),
-			"duration": latency,
+			"method":          httpMethod,
+			"path":            httpPath,
+			"status":          httpStatus,
+			"duration":        latency,
+			"userID":          userID,
+			"clientIP":        clientIP,
+			"responseHeaders": responseHeaders,
+			"responsePayload": responsePayload,
 		}).Info("Request completed")
 	}
 }

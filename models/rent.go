@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -60,7 +60,8 @@ func (rent *Rent) BeforeCreate(tx *gorm.DB) (err error) {
 
 	// Check if 'post.Available' is not nil and is set to 'false'
 	if post.Available != nil && !*post.Available {
-		return fmt.Errorf("Post is not available!")
+		err = errors.New("Post is not available")
+		return err
 	}
 
 	return nil
@@ -89,6 +90,43 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 	}
 
 	if err := tx.Create(&rentDetail).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
+
+	var rent Rent
+	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+		return err
+	}
+
+	if *rent.IsCancelled {
+		err = errors.New("can't update, rent was cancelled")
+		return err
+	}
+
+	return nil
+}
+
+func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
+	var rent Rent
+	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+		return err
+	}
+
+	var post Post
+	if err := tx.First(&post, rent.PostID).Error; err != nil {
+		return err
+	}
+
+	if rentDetail.Status == "Done" || rentDetail.Status == "Declined" {
+		*post.Available = true
+	}
+
+	if err := tx.Save(&post).Error; err != nil {
 		return err
 	}
 

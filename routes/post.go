@@ -9,6 +9,7 @@ import (
 func SetupPostRoutes(public *gin.RouterGroup) {
 	postGroup := public.Group("/posts")
 	postGroup.Use(middlewares.AuthMiddleware())
+	postGroup.Use(middlewares.LogMiddleware())
 	{
 		postGroup.GET("", controllers.GetPosts)                   // done test
 		postGroup.GET("/:post_id", controllers.GetPostById)       // done test

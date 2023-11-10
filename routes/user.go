@@ -9,6 +9,7 @@ import (
 func SetupUserRoutes(public *gin.RouterGroup) {
 	userGroup := public.Group("/users")
 	userGroup.Use(middlewares.AuthMiddleware())
+	userGroup.Use(middlewares.LogMiddleware())
 	{
 		userGroup.GET("", controllers.GetUsers)
 		userGroup.GET("/:user_id", controllers.GetUserById)

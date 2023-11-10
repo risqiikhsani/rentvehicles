@@ -9,6 +9,7 @@ import (
 func SetupLocationRoutes(public *gin.RouterGroup) {
 	locationGroup := public.Group("/locations")
 	locationGroup.Use(middlewares.AuthMiddleware())
+	locationGroup.Use(middlewares.LogMiddleware())
 	{
 		locationGroup.POST("", controllers.CreateLocation)                    // done test
 		locationGroup.GET("", controllers.GetLocations)                       // done test

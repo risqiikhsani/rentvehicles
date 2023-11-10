@@ -1,42 +1,8 @@
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-
-[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
-[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
-[GIN-debug] POST   /api/register             --> github.com/risqiikhsani/rentvehicles/controllers.Register (3 handlers)
-[GIN-debug] POST   /api/register-admin       --> github.com/risqiikhsani/rentvehicles/controllers.RegisterAdmin (3 handlers)
-[GIN-debug] POST   /api/login                --> github.com/risqiikhsani/rentvehicles/controllers.Login (3 handlers)
-[GIN-debug] GET    /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.GetUsers (5 handlers)
-[GIN-debug] GET    /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetUserById (5 handlers)
-[GIN-debug] PUT    /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdateUserById (5 handlers)
-[GIN-debug] DELETE /api/users/:user_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeleteUserById (5 handlers)
-[GIN-debug] POST   /api/users                --> github.com/risqiikhsani/rentvehicles/controllers.CreateUser (5 handlers)
-[GIN-debug] PUT    /api                      --> github.com/risqiikhsani/rentvehicles/controllers.UpdateAccount (3 handlers)
-[GIN-debug] GET    /api                      --> github.com/risqiikhsani/rentvehicles/controllers.GetAccount (3 handlers)
-[GIN-debug] GET    /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.GetPosts (5 handlers)
-[GIN-debug] GET    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetPostById (5 handlers)
-[GIN-debug] PUT    /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdatePostById (5 handlers)
-[GIN-debug] DELETE /api/posts/:post_id       --> github.com/risqiikhsani/rentvehicles/controllers.DeletePostById (5 handlers)
-[GIN-debug] POST   /api/posts                --> github.com/risqiikhsani/rentvehicles/controllers.CreatePost (5 handlers)
-[GIN-debug] POST   /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.CreateLocation (5 handlers)
-[GIN-debug] GET    /api/locations            --> github.com/risqiikhsani/rentvehicles/controllers.GetLocations (5 handlers)
-[GIN-debug] GET    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.GetLocationById (5 handlers)
-[GIN-debug] PUT    /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.UpdateLocationById (5 handlers)
-[GIN-debug] DELETE /api/locations/:location_id --> github.com/risqiikhsani/rentvehicles/controllers.DeleteLocationById (5 handlers)
-[GIN-debug] POST   /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.CreateCat.func1 (5 handlers)
-[GIN-debug] GET    /api/cats                 --> github.com/risqiikhsani/rentvehicles/controllers.GetCats.func1 (5 handlers)
-[GIN-debug] GET    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.GetCatById.func1 (5 handlers)
-[GIN-debug] PUT    /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.UpdateCatById.func1 (5 handlers)
-[GIN-debug] DELETE /api/cats/:cat_id         --> github.com/risqiikhsani/rentvehicles/controllers.DeleteCatById.func1 (5 handlers)
-[GIN-debug] GET    /api/rents                --> github.com/risqiikhsani/rentvehicles/controllers.GetRents (5 handlers)
-[GIN-debug] GET    /api/rents/:rent_id       --> github.com/risqiikhsani/rentvehicles/controllers.GetRentById (5 handlers)
-[GIN-debug] PUT    /api/rents/:rent_id       --> github.com/risqiikhsani/rentvehicles/controllers.UpdateRentById (5 handlers)
-[GIN-debug] POST   /api/rents                --> github.com/risqiikhsani/rentvehicles/controllers.CreateRent (5 handlers)
-[GIN-debug] POST   /api/rents/:rent_id/cancel -->  (5 handlers)
-[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
-Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
-[GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2023/11/09 - 15:37:01 | 200 |    67.21912ms |             ::1 | POST     "/api/login"
+{"clientIP":"[::1]:58995","level":"info","method":"GET","msg":"Request received","path":"/api/posts","requestHeaders":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate, br"],"Authorization":["[REDACTED]"],"Cache-Control":["no-cache"],"Connection":["keep-alive"],"Postman-Token":["0d324bfc-182f-45e1-be66-3c49b2e37553"],"User-Agent":["PostmanRuntime/7.34.0"]},"time":"2023-11-10T16:45:05+07:00","userID":2}
+{"clientIP":"[::1]:58995","duration":15903800,"level":"info","method":"GET","msg":"Request completed","path":"/api/posts","responseHeaders":{"Content-Type":["application/json; charset=utf-8"]},"responsePayload":2,"status":200,"time":"2023-11-10T16:45:05+07:00","userID":2}
+{"clientIP":"[::1]:58995","level":"info","method":"GET","msg":"Request received","path":"/api/posts","requestHeaders":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate, br"],"Authorization":["[REDACTED]"],"Cache-Control":["no-cache"],"Connection":["keep-alive"],"Postman-Token":["6a013ff0-0c57-462d-9aa5-5fe6149e5f9c"],"User-Agent":["PostmanRuntime/7.34.0"]},"time":"2023-11-10T16:45:19+07:00","userID":2}
+{"clientIP":"[::1]:58995","duration":12078700,"level":"info","method":"GET","msg":"Request completed","path":"/api/posts","responseHeaders":{"Content-Type":["application/json; charset=utf-8"]},"responsePayload":2,"status":200,"time":"2023-11-10T16:45:19+07:00","userID":2}
+{"clientIP":"[::1]:58995","level":"info","method":"GET","msg":"Request received","path":"/api/posts","requestHeaders":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate, br"],"Authorization":["[REDACTED]"],"Cache-Control":["no-cache"],"Connection":["keep-alive"],"Postman-Token":["cef357bd-b0c1-48d5-b1cd-d3ae26a0b748"],"User-Agent":["PostmanRuntime/7.34.0"]},"time":"2023-11-10T16:45:21+07:00","userID":2}
+{"clientIP":"[::1]:58995","duration":3078000,"level":"info","method":"GET","msg":"Request completed","path":"/api/posts","responseHeaders":{"Content-Type":["application/json; charset=utf-8"]},"responsePayload":2,"status":200,"time":"2023-11-10T16:45:21+07:00","userID":2}
+{"clientIP":"[::1]:58995","level":"info","method":"GET","msg":"Request received","path":"/api/posts","requestHeaders":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate, br"],"Authorization":["[REDACTED]"],"Cache-Control":["no-cache"],"Connection":["keep-alive"],"Postman-Token":["4fd9c638-c794-488d-b816-d029e6dbb163"],"User-Agent":["PostmanRuntime/7.34.0"]},"time":"2023-11-10T16:45:24+07:00","userID":2}
+{"clientIP":"[::1]:58995","duration":6180700,"level":"info","method":"GET","msg":"Request completed","path":"/api/posts","responseHeaders":{"Content-Type":["application/json; charset=utf-8"]},"responsePayload":2,"status":200,"time":"2023-11-10T16:45:24+07:00","userID":2}

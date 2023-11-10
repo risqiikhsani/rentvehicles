@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	// "github.com/joho/godotenv"
 	"github.com/risqiikhsani/rentvehicles/configs"
+	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
 	"github.com/risqiikhsani/rentvehicles/utils"
@@ -46,11 +45,12 @@ func main() {
 	gin.DisableConsoleColor()
 
 	// Logging to a file.
-	f, _ := os.Create(appConfig.LogFile)
+	// f, _ := os.Create(appConfig.LogFile)
 	//gin.DefaultWriter = io.MultiWriter(f)
 
 	// Use the following code if you need to write the logs to file and console at the same time.
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	// gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	middlewares.InitializeLogging(appConfig.LogFile)
 	// logrus.SetOutput(io.MultiWriter(f, os.Stdout))
 
 	// utils.InitializeValidator()

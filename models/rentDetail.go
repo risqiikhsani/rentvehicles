@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -30,7 +30,8 @@ func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
 	}
 
 	if *rent.IsCancelled {
-		return fmt.Errorf("Rent was cancelled by consumer, can't update!")
+		err = errors.New("can't update, rent was cancelled")
+		return err
 	}
 
 	return nil

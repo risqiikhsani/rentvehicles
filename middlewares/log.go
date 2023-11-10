@@ -1,11 +1,28 @@
 package middlewares
 
 import (
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
+
+var logFile *os.File
+
+func InitializeLogging(logFilePath string) {
+	logFile = createLogFile(logFilePath)
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetOutput(logFile)
+}
+
+func createLogFile(logFilePath string) *os.File {
+	f, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		logrus.Fatalf("error opening file: %v", err)
+	}
+	return f
+}
 
 // LogMiddleware is responsible for logging requests and responses
 func LogMiddleware() gin.HandlerFunc {
@@ -14,9 +31,8 @@ func LogMiddleware() gin.HandlerFunc {
 
 		// Log the request
 		userID, _ := c.Get("userID")
-		// clientIP := c.ClientIP() // Get client's IP address
 		clientIP := c.Request.RemoteAddr
-		requestHeaders := c.Request.Header
+		requestHeaders := filterSensitiveHeaders(c.Request.Header)
 		httpMethod := c.Request.Method
 		httpPath := c.Request.URL.Path
 
@@ -49,4 +65,19 @@ func LogMiddleware() gin.HandlerFunc {
 			"responsePayload": responsePayload,
 		}).Info("Request completed")
 	}
+}
+
+// Function to filter sensitive headers
+func filterSensitiveHeaders(headers map[string][]string) map[string][]string {
+	filteredHeaders := make(map[string][]string)
+
+	for key, values := range headers {
+		if key == "Authorization" {
+			filteredHeaders[key] = []string{"[REDACTED]"} // Redact sensitive header
+		} else {
+			filteredHeaders[key] = values
+		}
+	}
+
+	return filteredHeaders
 }

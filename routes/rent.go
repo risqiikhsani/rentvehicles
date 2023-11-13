@@ -22,3 +22,12 @@ func SetupRentRoutes(public *gin.RouterGroup) {
 		rentGroup.POST("/:rent_id/cancel", nil)
 	}
 }
+
+func SetupRentDetailRoutes(public *gin.RouterGroup) {
+	rentGroup := public.Group("/rent-details")
+	rentGroup.Use(middlewares.AuthMiddleware())
+	rentGroup.Use(middlewares.LogMiddleware())
+	{
+		rentGroup.PUT("/:rent_detail_id", controllers.UpdateRentDetailById)
+	}
+}

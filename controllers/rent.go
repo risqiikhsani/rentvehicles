@@ -47,14 +47,15 @@ func GetEstimateRentPrice(c *gin.Context) {
 		return
 	}
 
-	estimatedPrice, savedPrice, _ := post.CalculateRentalPrice(uint(rentDays))
+	finalPrice, normalPrice, savedPrice, _ := post.CalculateRentalPrice(uint(rentDays))
 
 	c.JSON(http.StatusOK, gin.H{
-		"post_id":         postId,
-		"rent_days":       rentDays,
-		"voucher_code":    voucherCodeStr,
-		"estimated_price": estimatedPrice,
-		"saved_price":     savedPrice,
+		"post_id":                postId,
+		"rent_days":              rentDays,
+		"voucher_code":           voucherCodeStr,
+		"estimated_final_price":  finalPrice,
+		"estimated_normal_price": normalPrice,
+		"estimated_saved_price":  savedPrice,
 	})
 }
 
@@ -125,7 +126,7 @@ func CreateRent(c *gin.Context) {
 
 	// Create the rent in the database
 	if err := models.DB.Create(&rent).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Something went wrong, Failed to create comment"})
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -176,7 +177,7 @@ func UpdateRentById(c *gin.Context) {
 	}
 
 	if err := models.DB.Save(&existingRent).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rent"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

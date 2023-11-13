@@ -64,7 +64,7 @@ func UpdateRentDetailById(c *gin.Context) {
 	}
 
 	if err := models.DB.Save(&existingRentDetail).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rent"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

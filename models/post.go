@@ -32,9 +32,9 @@ type Post struct {
 	// Other fields
 }
 
-func (post *Post) CalculateRentalPrice(rentDays uint) (uint, int, error) {
+func (post *Post) CalculateRentalPrice(rentDays uint) (uint, uint, uint, error) {
 	if rentDays == 0 {
-		return 0, 0, nil
+		return 0, 0, 0, nil
 	}
 
 	// Calculate the total price based on rental duration
@@ -69,11 +69,11 @@ func (post *Post) CalculateRentalPrice(rentDays uint) (uint, int, error) {
 
 	if post.DiscountPercentage != 0 {
 		discountedPrice = totalPrice - (totalPrice * post.DiscountPercentage / 100)
-		savedPrice = int(totalPrice)
-		return discountedPrice, -savedPrice, nil
+		savedPrice = int(totalPrice * post.DiscountPercentage / 100)
+		return discountedPrice, totalPrice, uint(savedPrice), nil
 	}
 
-	return totalPrice, -savedPrice, nil
+	return totalPrice, totalPrice, uint(savedPrice), nil
 }
 
 func (post *Post) BeforeSave(tx *gorm.DB) (err error) {

@@ -82,12 +82,14 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 	}
 
 	totalDays := rent.CalculateTotalDays()
-	estimatedPrice, savedPrice, _ := post.CalculateRentalPrice(uint(totalDays))
+	finalPrice, normalPrice, savedPrice, _ := post.CalculateRentalPrice(uint(totalDays))
 	// Create a RentDetail associated with this Rent
 	rentDetail := RentDetail{
-		RentID:              rent.ID,
-		EstimatedPrice:      estimatedPrice,
-		EstimatedSavedPrice: savedPrice,
+		RentDays:             totalDays,
+		RentID:               rent.ID,
+		EstimatedFinalPrice:  finalPrice,
+		EstimatedNormalPrice: normalPrice,
+		EstimatedSavedPrice:  savedPrice,
 	}
 
 	if err := tx.Create(&rentDetail).Error; err != nil {
@@ -99,6 +101,14 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 
+	if rent.Readonly {
+		err = errors.New("Read only data")
+		return err
+	}
+
+	if *rent.IsCancelled {
+		rent.Readonly = true
+	}
 	return
 }
 

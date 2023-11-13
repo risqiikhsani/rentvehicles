@@ -17,7 +17,7 @@ type Rent struct {
 	// PickupDate    time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
 	// ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
 	// Status        string  `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'Cancelled', 'OnGoing','Done');default:'ReadyToPickup'"`
-	PaymentMethod string `json:"payment_method" form:"payment_method" gorm:"default:'paylater'"`
+	PaymentMethod string `json:"payment_method" form:"payment_method" gorm:"default:'Paylater'" validate:"oneof=Paylater PayInFront"`
 	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
 	DiscountCode  string `json:"discount_voucher" form:"discount_voucher"`
@@ -25,16 +25,6 @@ type Rent struct {
 	RentDetail    RentDetail
 	// Other fields
 }
-
-// payment method
-// paylater
-// pay in front
-
-// Declined
-// Accepted
-// ReadyToPickup
-// OnProgress
-// Done
 
 func (rent *Rent) CalculateTotalDays() int {
 	// Calculate the duration between the StartDate and EndDate

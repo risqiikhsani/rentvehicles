@@ -18,25 +18,31 @@ type RentDetail struct {
 	EstimatedSavedPrice  uint      `json:"estimated_saved_price" form:"estimated_saved_price" `
 	RentDays             int       `json:"rent_days" form:"rent_days" `
 	DeclineReason        string    `json:"decline_reason" form:"decline_reason"`
-	Status               string    `json:"status" form:"status" gorm:"default:'Accepted'"`
+	Status               string    `json:"status" form:"status" gorm:"default:'Accepted'" validate:"oneof=Accepted Declined ReadyToPickup OnProgress Done"`
 	Images               []Image   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Text                 string    `json:"text" form:"text"`
 	RentID               uint
 }
 
+// Declined
+// Accepted
+// ReadyToPickup
+// OnProgress
+// Done
+
 func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
 
+	// Additional checks after status validation
 	var rent Rent
 	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
 		return err
 	}
 
 	if *rent.IsCancelled {
-		err = errors.New("can't update, rent was cancelled")
-		return err
+		return errors.New("can't update, rent was cancelled")
 	}
 
-	return nil
+	return nil // All checks passed, return nil for no errors
 }
 
 func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
@@ -50,7 +56,12 @@ func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
 		return err
 	}
 
+	if rentDetail.Status == "OnProgress" {
+		rent.Readonly = true
+	}
+
 	if rentDetail.Status == "Done" || rentDetail.Status == "Declined" {
+		rent.Readonly = true
 		*post.Available = true
 	}
 

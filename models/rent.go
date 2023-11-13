@@ -21,6 +21,7 @@ type Rent struct {
 	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
 	DiscountCode  string `json:"discount_voucher" form:"discount_voucher"`
+	Readonly      bool   `json:"readonly" form:"readonly" gorm:"default:false"`
 	RentDetail    RentDetail
 	// Other fields
 }
@@ -94,4 +95,27 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 	}
 
 	return nil
+}
+
+func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
+
+	return
+}
+
+func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {
+	// Fetch the associated Post model by ID
+	var post Post
+	if err := tx.First(&post, rent.PostID).Error; err != nil {
+		return err
+	}
+
+	if *rent.IsCancelled {
+		*post.Available = true
+	}
+
+	if err := tx.Save(&post).Error; err != nil {
+		return err
+	}
+
+	return
 }

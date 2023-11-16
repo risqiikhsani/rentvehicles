@@ -65,6 +65,10 @@ func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
 		*post.Available = true
 	}
 
+	if err := tx.Save(&rent).Error; err != nil {
+		return err
+	}
+
 	if err := tx.Save(&post).Error; err != nil {
 		return err
 	}

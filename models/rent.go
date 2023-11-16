@@ -17,7 +17,7 @@ type Rent struct {
 	// PickupDate    time.Time `json:"pickup_date" form:"pickup_date" validate:"gtefield=StartDate,ltefield=EndDate"`
 	// ReturnDate    time.Time `json:"return_date" form:"return_date" validate:"gtefield=PickupDate,ltefield=EndDate"`
 	// Status        string  `json:"status" form:"status" gorm:"type:enum('ReadyToPickup', 'Cancelled', 'OnGoing','Done');default:'ReadyToPickup'"`
-	PaymentMethod string `json:"payment_method" form:"payment_method" gorm:"default:'Paylater'" validate:"oneof=Paylater PayInFront"`
+	PaymentMethod string `json:"payment_method" form:"payment_method" gorm:"default:'Paylater'" validate:"omitempty,oneof=Paylater PayInFront"`
 	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
 	DiscountCode  string `json:"discount_voucher" form:"discount_voucher"`
@@ -75,6 +75,8 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 	finalPrice, normalPrice, savedPrice, _ := post.CalculateRentalPrice(uint(totalDays))
 	// Create a RentDetail associated with this Rent
 	rentDetail := RentDetail{
+		PickupDate:           nil,
+		ReturnDate:           nil,
 		RentDays:             totalDays,
 		RentID:               rent.ID,
 		EstimatedFinalPrice:  finalPrice,
@@ -92,7 +94,7 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 
 	if rent.Readonly {
-		err = errors.New("Read only data")
+		err = errors.New("read only data")
 		return err
 	}
 

@@ -93,7 +93,7 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 
-	// this will make error "rent is read only" when AfterUpdate hook's rentDetail was called
+	// this will make error "rent is read only" when RentDetail's AfterUpdate hook was called
 	// eventhough the rent's readonly was false in the database.
 	// if rent.Readonly {
 	// 	err = errors.New("Rent is read only")

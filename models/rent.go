@@ -100,7 +100,7 @@ func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 	// 	return err
 	// }
 
-	// to solve the problem above, we have to get the data from db first, then check it
+	// to solve the problem above, we have to fetch the data from db first, then check it
 	// Retrieve the existing record from the database to compare with the updated values
 	var existingRent Rent
 	if err := tx.First(&existingRent, rent.ID).Error; err != nil {

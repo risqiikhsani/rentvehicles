@@ -42,6 +42,12 @@ func (rentDetail *RentDetail) BeforeUpdate(tx *gorm.DB) (err error) {
 		return errors.New("can't update, rent was cancelled")
 	}
 
+	if rentDetail.Status == "OnProgress" || rentDetail.Status == "Done" {
+		if !rentDetail.IsPaid {
+			return errors.New("can't update, rent is not paid")
+		}
+	}
+
 	return nil // All checks passed, return nil for no errors
 }
 

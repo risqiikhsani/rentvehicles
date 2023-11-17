@@ -121,6 +121,8 @@ func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 	return nil
 }
 
+// AfterUpdate is a method that is called after a Rent model is updated
+// It updates the associated Post model based on the updated Rent status
 func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {
 	// Fetch the associated Post model by ID
 	var post Post
@@ -128,11 +130,24 @@ func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {
 		return err
 	}
 
+	var existingRent Rent
+	if err := tx.First(&existingRent, rent.ID).Error; err != nil {
+		return err
+	}
+
+	// If the Rent is cancelled, set the Post as available
 	if *rent.IsCancelled {
+		rent.Readonly = true
 		*post.Available = true
 	}
 
+	// Save the updated Post model
 	if err := tx.Save(&post).Error; err != nil {
+		return err
+	}
+
+	// Save the updated Post model
+	if err := tx.Save(&existingRent).Error; err != nil {
 		return err
 	}
 

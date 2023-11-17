@@ -92,16 +92,24 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
-
-	if rent.Readonly {
-		err = errors.New("read only data")
+	// Retrieve the existing record from the database to compare with the updated values
+	var existingRent Rent
+	if err := tx.First(&existingRent, rent.ID).Error; err != nil {
 		return err
 	}
 
-	if *rent.IsCancelled {
+	// Check if the rent is marked as read-only
+	if existingRent.Readonly {
+		err = errors.New("Rent is read only")
+		return err
+	}
+
+	// If the rent is cancelled, mark it as read-only
+	if rent.IsCancelled != nil && *rent.IsCancelled {
 		rent.Readonly = true
 	}
-	return
+
+	return nil
 }
 
 func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {

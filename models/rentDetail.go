@@ -30,7 +30,7 @@ type RentDetail struct {
 // OnProgress
 // Done
 
-func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
+func (rentDetail *RentDetail) BeforeUpdate(tx *gorm.DB) (err error) {
 
 	// Additional checks after status validation
 	var rent Rent
@@ -45,7 +45,7 @@ func (rentDetail *RentDetail) BeforeSave(tx *gorm.DB) (err error) {
 	return nil // All checks passed, return nil for no errors
 }
 
-func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
+func (rentDetail *RentDetail) AfterUpdate(tx *gorm.DB) (err error) {
 	var rent Rent
 	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
 		return err
@@ -75,3 +75,21 @@ func (rentDetail *RentDetail) AfterSave(tx *gorm.DB) (err error) {
 
 	return nil
 }
+
+// func (rentDetail *RentDetail) AfterUpdate(tx *gorm.DB) (err error) {
+// 	// Fetch the associated Rent model by ID
+// 	var rent Rent
+// 	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+// 		return err
+// 	}
+
+// 	// Update Rent's Readonly field to true
+// 	rent.Readonly = true
+
+// 	// Save the updated Rent model
+// 	if err := tx.Save(&rent).Error; err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }

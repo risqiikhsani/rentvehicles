@@ -92,6 +92,15 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
+
+	// this will make error "rent is read only" when AfterUpdate hook's rentDetail was called
+	// eventhough the rent's readonly was false in the database.
+	// if rent.Readonly {
+	// 	err = errors.New("Rent is read only")
+	// 	return err
+	// }
+
+	// to solve the problem above, we have to get the data from db first, then check it
 	// Retrieve the existing record from the database to compare with the updated values
 	var existingRent Rent
 	if err := tx.First(&existingRent, rent.ID).Error; err != nil {

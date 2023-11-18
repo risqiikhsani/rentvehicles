@@ -8,10 +8,12 @@ import (
 
 func SetupRentRoutes(public *gin.RouterGroup) {
 	rentGroup := public.Group("/rents")
+	{
+		rentGroup.GET("estimateprice", controllers.GetEstimateRentPrice)
+	}
 	rentGroup.Use(middlewares.AuthMiddleware())
 	rentGroup.Use(middlewares.LogMiddleware())
 	{
-		rentGroup.GET("estimateprice", controllers.GetEstimateRentPrice)
 		rentGroup.GET("", controllers.GetRents)
 		rentGroup.GET("/:rent_id", controllers.GetRentById)
 		rentGroup.PUT("/:rent_id", controllers.UpdateRentById)

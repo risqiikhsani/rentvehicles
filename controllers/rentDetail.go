@@ -33,11 +33,6 @@ func UpdateRentDetailById(c *gin.Context) {
 		return
 	}
 
-	if *rent.IsCancelled {
-		c.JSON(http.StatusNotFound, gin.H{"error": "can't update, the rent has been cancelled by consumer."})
-		return
-	}
-
 	// return error if associated post is not found
 	var post models.Post
 	if err := models.DB.First(&post, rent.PostID).Error; err != nil {
@@ -46,13 +41,13 @@ func UpdateRentDetailById(c *gin.Context) {
 	}
 
 	// only allow poster (admin) to update rent data
-	if rent.UserID != userID {
+	if post.UserID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to update this rent detail"})
 		return
 	}
 
 	// Update the text of the rent
-	if err := c.ShouldBindJSON(&existingRentDetail); err != nil {
+	if err := c.ShouldBind(&existingRentDetail); err != nil {
 		c.JSON(400, gin.H{"errors": err.Error()})
 		return
 	}
@@ -65,6 +60,39 @@ func UpdateRentDetailById(c *gin.Context) {
 
 	if err := models.DB.Save(&existingRentDetail).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Handle image uploads and deletions
+
+	// Parse the multipart form data to handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	imageIDsToDelete := c.PostFormArray("delete_image_ids")
+
+	// Delete selected images from the database and file system
+	if len(imageIDsToDelete) > 0 {
+		if err := handlers.DeleteRentDetailImages(c, existingRentDetail.ID, imageIDsToDelete); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete images"})
+			return
+		}
+	}
+
+	images := form.File["images"]
+
+	// Handle file uploads and create image records
+	if err := handlers.UploadRentDetailImages(c, &existingRentDetail.ID, images); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 

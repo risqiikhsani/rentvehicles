@@ -56,6 +56,19 @@ func main() {
 	// utils.InitializeValidator()
 	r := gin.Default()
 
+	// CORS middleware to allow requests from localhost:3000 (Next.js development)
+	r.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS") // Include DELETE here
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(200)
+			return
+		}
+		c.Next()
+	})
+
 	utils.InitializeTranslator() // translator first , because initializeValidator needs it
 	utils.InitializeValidator()
 
@@ -70,6 +83,7 @@ func main() {
 	}
 
 	public := r.Group("/api")
+	// public.Use(cors.Default())
 	// public.Use(middlewares.AuthMiddleware())
 	// public.Use(middlewares.LogMiddleware())
 	routes.SetupPublicAccountRoutes(public)
@@ -82,6 +96,12 @@ func main() {
 	routes.SetupRentDetailRoutes(public)
 
 	addr := fmt.Sprintf(":%s", serverPort)
+
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://google.com"}
+	// // config.AllowOrigins = []string{"http://google.com", "http://facebook.com"}
+	// config.AllowAllOrigins = true
+
 	if err := r.Run(addr); err != nil {
 		log.Fatalf("Failed to start the server: %v", err)
 	}

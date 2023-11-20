@@ -25,7 +25,7 @@ func GetPostById(c *gin.Context) {
 	postID := c.Param("post_id")
 	var post models.Post
 
-	if err := models.DB.Preload(clause.Associations).First(&post, postID).Error; err != nil {
+	if err := models.DB.Preload("Images").Preload("MainImage").First(&post, postID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}

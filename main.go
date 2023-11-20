@@ -60,7 +60,7 @@ func main() {
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS") // Include DELETE here
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(200)
@@ -88,7 +88,7 @@ func main() {
 	// public.Use(middlewares.LogMiddleware())
 	routes.SetupPublicAccountRoutes(public)
 	routes.SetupUserRoutes(public)
-	routes.SetupAccountRoutes(public)
+	routes.SetupMeRoutes(public)
 	routes.SetupPostRoutes(public)
 	routes.SetupLocationRoutes(public)
 	routes.SetupCatRoutes(public, dbInstance)

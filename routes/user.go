@@ -13,8 +13,8 @@ func SetupUserRoutes(public *gin.RouterGroup) {
 	{
 		userGroup.GET("", controllers.GetUsers)
 		userGroup.GET("/:user_id", controllers.GetUserById)
-		userGroup.PUT("/:user_id", controllers.UpdateUserById)
-		userGroup.DELETE("/:user_id", controllers.DeleteUserById)
-		userGroup.POST("", controllers.CreateUser)
+		// userGroup.PUT("/:user_id", controllers.UpdateUserById)
+		// userGroup.DELETE("/:user_id", controllers.DeleteUserById)
+		// userGroup.POST("", controllers.CreateUser)
 	}
 }

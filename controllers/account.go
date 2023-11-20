@@ -334,7 +334,7 @@ func ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Password reset instructions sent to your email"})
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset instructions have been sent to your email"})
 }
 
 type ResetPasswordInput struct {

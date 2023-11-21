@@ -57,14 +57,37 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	// Parse the multipart form data to handle file uploads
+	// Handle file uploads
+	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	mainImage := form.File["main_image"]
+	images := form.File["images"]
+
+	// Check if mainImage slice is not empty
+	if len(mainImage) == 0 {
+		// Handle the case when mainImage is empty, e.g., return an error or take appropriate action.
+		c.JSON(400, gin.H{"error": "Main image is missing"})
+		return
+	}
+
+	// Create the post only if the main image is present
 	var post models.Post
 
 	if err := c.ShouldBind(&post); err != nil {
 		c.JSON(400, gin.H{"errors": err.Error()})
 		return
 	}
+
 	// Set the post's user ID to the authenticated user
 	post.UserID = userID
 
@@ -80,32 +103,9 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	// Handle file uploads
-	err := c.Request.ParseMultipartForm(10 << 20) // 10 MB max file size
-	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	form, err := c.MultipartForm()
-	if err != nil {
+	// Handle file uploads and create image records
+	if err := handlers.UploadMainPostImage(c, &post.ID, mainImage[0]); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-
-	main_image := form.File["main_image"]
-	images := form.File["images"]
-
-	// Check if main_image slice is not empty
-	if len(main_image) > 0 {
-		// Handle file uploads and create image records
-		if err := handlers.UploadMainPostImage(c, &post.ID, main_image[0]); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-	} else {
-		// Handle the case when main_image is empty, e.g., return an error or take appropriate action.
-		c.JSON(400, gin.H{"error": "Main image is missing"})
 		return
 	}
 

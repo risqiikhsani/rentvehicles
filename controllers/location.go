@@ -27,7 +27,7 @@ func GetLocationById(c *gin.Context) {
 }
 
 func CreateLocation(c *gin.Context) {
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}
@@ -57,7 +57,7 @@ func CreateLocation(c *gin.Context) {
 
 func UpdateLocationById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}
@@ -97,7 +97,7 @@ func UpdateLocationById(c *gin.Context) {
 
 func DeleteLocationById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}

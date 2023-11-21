@@ -11,7 +11,7 @@ import (
 
 func UpdateRentDetailById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}

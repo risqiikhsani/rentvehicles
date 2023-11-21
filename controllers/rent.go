@@ -103,7 +103,7 @@ func GetRentById(c *gin.Context) {
 }
 
 func CreateRent(c *gin.Context) {
-	userID, _, authenticated := handlers.RequireAuthentication(c, "basic")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Basic")
 	if !authenticated {
 		return
 	}
@@ -136,7 +136,7 @@ func CreateRent(c *gin.Context) {
 
 func UpdateRentById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "basic")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Basic")
 	if !authenticated {
 		return
 	}

@@ -21,6 +21,22 @@ func GetPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, posts)
 }
 
+func GetMyPosts(c *gin.Context) {
+	// Check if the user is authenticated
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
+	if !authenticated {
+		return
+	}
+
+	var posts []models.Post
+	if err := models.DB.Where("user_id = ?", userID).Preload(clause.Associations).Find(&posts).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No posts found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, posts)
+}
+
 func GetPostById(c *gin.Context) {
 	postID := c.Param("post_id")
 	var post models.Post
@@ -36,7 +52,7 @@ func GetPostById(c *gin.Context) {
 func CreatePost(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}
@@ -104,7 +120,7 @@ func CreatePost(c *gin.Context) {
 
 func UpdatePostById(c *gin.Context) {
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}
@@ -191,7 +207,7 @@ func UpdatePostById(c *gin.Context) {
 func DeletePostById(c *gin.Context) {
 
 	// Check if the user is authenticated
-	userID, _, authenticated := handlers.RequireAuthentication(c, "admin")
+	userID, _, authenticated := handlers.RequireAuthentication(c, "Admin")
 	if !authenticated {
 		return
 	}

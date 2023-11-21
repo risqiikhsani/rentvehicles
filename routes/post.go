@@ -15,6 +15,7 @@ func SetupPostRoutes(public *gin.RouterGroup) {
 	postGroup.Use(middlewares.AuthMiddleware())
 	postGroup.Use(middlewares.LogMiddleware())
 	{
+		postGroup.GET("/created", controllers.GetMyPosts)
 		postGroup.PUT("/:post_id", controllers.UpdatePostById)    // done test
 		postGroup.DELETE("/:post_id", controllers.DeletePostById) // done test
 		postGroup.POST("", controllers.CreatePost)                // done test

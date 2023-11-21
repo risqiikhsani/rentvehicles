@@ -11,7 +11,7 @@ import (
 
 func GetLocations(c *gin.Context) {
 	var locations []models.Location
-	models.DB.Preload("Posts").Find(&locations)
+	models.DB.Find(&locations)
 	c.JSON(200, locations)
 }
 

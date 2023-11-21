@@ -16,5 +16,4 @@ type Location struct {
 	Latitude    string
 	Longitude   string
 	UserID      uint `validate:"required,numeric"`
-	Posts       []Post
 }

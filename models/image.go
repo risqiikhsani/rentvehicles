@@ -29,12 +29,13 @@ func SetStaticImagePath(path string) {
 	staticImagePath = path
 }
 
-func (i *Image) GetClickableURL() string {
+func (i Image) GetClickableURL() string {
 	// Construct the full image URL by appending the path to the base URL
 	return fmt.Sprintf("%s/%s/%s", baseURL, staticImagePath, filepath.Base(i.Path))
 }
 
-func (i *Image) MarshalJSON() ([]byte, error) {
+// https://pkg.go.dev/encoding/json
+func (i Image) MarshalJSON() ([]byte, error) {
 	jsonMap := map[string]interface{}{
 		"ID":        i.ID,
 		"CreatedAt": i.CreatedAt,
@@ -43,12 +44,13 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 		"url":       i.GetClickableURL(),
 	}
 
-	jsonString, err := json.Marshal(jsonMap)
-	if err != nil {
-		return nil, err
-	}
+	return json.Marshal(jsonMap)
 
-	return jsonString, nil
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return jsonString, nil
 }
 
 func (image *Image) BeforeDelete(tx *gorm.DB) (err error) {

@@ -107,3 +107,17 @@ func (post *Post) AfterDelete(tx *gorm.DB) (err error) {
 
 	return nil
 }
+
+func (post *Post) BeforeDelete(tx *gorm.DB) (err error) {
+
+	// if there is a rent for this post , that is on going . admin can't delete or update
+
+	return nil
+}
+
+func (post *Post) BeforeUpdate(tx *gorm.DB) (err error) {
+
+	// if there is a rent for this post , that is on going . admin can't delete or update
+
+	return nil
+}

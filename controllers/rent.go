@@ -68,10 +68,10 @@ func GetRents(c *gin.Context) {
 	var rents []models.Rent
 
 	// if basic user , rents data will be the user's rents history
-	if userRole == "basic" {
+	if userRole == "Basic" {
 		models.DB.Preload(clause.Associations).Where("user_id = ?", userID).Find(&rents)
 		// if admin user, rents data will be the rents data which post_id is admin's
-	} else if userRole == "admin" {
+	} else if userRole == "Admin" {
 		// Assuming an admin can only see rents associated with their own posts.
 		subquery := models.DB.Model(&models.Post{}).Select("ID").Where("user_id = ?", userID)
 		models.DB.Preload(clause.Associations).Where("post_id IN (?)", subquery).Find(&rents)

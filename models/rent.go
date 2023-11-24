@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ type Rent struct {
 	IsCancelled   *bool  `json:"is_cancelled" form:"is_cancelled" gorm:"default:false"`
 	CancelReason  string `json:"cancel_reason" form:"cancel_reason"`
 	DiscountCode  string `json:"discount_voucher" form:"discount_voucher"`
-	Readonly      bool   `json:"readonly" form:"readonly" gorm:"default:false"`
+	Readonly      *bool  `json:"readonly" form:"readonly" gorm:"default:false"`
 	RentDetail    RentDetail
 	// Other fields
 }
@@ -92,6 +93,7 @@ func (rent *Rent) AfterCreate(tx *gorm.DB) (err error) {
 }
 
 func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
+	fmt.Println("Rent's before update is running")
 
 	// this will make error "rent is read only" when RentDetail's AfterUpdate hook was called
 	// eventhough the rent's readonly was false in the database.
@@ -108,14 +110,16 @@ func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 	}
 
 	// Check if the rent is marked as read-only
-	if existingRent.Readonly {
+	if *existingRent.Readonly {
+		fmt.Println("if rent readonly was true, can't update !")
 		err = errors.New("Rent is read only")
 		return err
 	}
 
 	// If the rent is cancelled, mark it as read-only
-	if rent.IsCancelled != nil && *rent.IsCancelled {
-		rent.Readonly = true
+	if *rent.IsCancelled {
+		fmt.Println("if rent is cancelled , readonly = true")
+		*rent.Readonly = true
 	}
 
 	return nil
@@ -124,20 +128,22 @@ func (rent *Rent) BeforeUpdate(tx *gorm.DB) (err error) {
 // AfterUpdate is a method that is called after a Rent model is updated
 // It updates the associated Post model based on the updated Rent status
 func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {
+	fmt.Println("Rent's after update is running")
 	// Fetch the associated Post model by ID
 	var post Post
 	if err := tx.First(&post, rent.PostID).Error; err != nil {
 		return err
 	}
 
-	var existingRent Rent
-	if err := tx.First(&existingRent, rent.ID).Error; err != nil {
-		return err
-	}
+	// var existingRent Rent
+	// if err := tx.First(&existingRent, rent.ID).Error; err != nil {
+	// 	return err
+	// }
 
 	// If the Rent is cancelled, set the Post as available
 	if *rent.IsCancelled {
-		rent.Readonly = true
+		fmt.Println("If rent is cancelled, post available = true")
+		// *rent.Readonly = true
 		*post.Available = true
 	}
 
@@ -146,10 +152,10 @@ func (rent *Rent) AfterUpdate(tx *gorm.DB) (err error) {
 		return err
 	}
 
-	// Save the updated Post model
-	if err := tx.Save(&existingRent).Error; err != nil {
-		return err
-	}
+	// // Save the updated Post model
+	// if err := tx.Save(&existingRent).Error; err != nil {
+	// 	return err
+	// }
 
 	return
 }

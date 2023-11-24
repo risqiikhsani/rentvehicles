@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -31,6 +32,7 @@ type RentDetail struct {
 // Done
 
 func (rentDetail *RentDetail) BeforeUpdate(tx *gorm.DB) (err error) {
+	fmt.Println("RentDetail's before update is running")
 
 	// Additional checks after status validation
 	var rent Rent
@@ -52,30 +54,30 @@ func (rentDetail *RentDetail) BeforeUpdate(tx *gorm.DB) (err error) {
 }
 
 func (rentDetail *RentDetail) AfterUpdate(tx *gorm.DB) (err error) {
-	var rent Rent
-	if err := tx.First(&rent, rentDetail.RentID).Error; err != nil {
+	fmt.Println("RentDetail's after update is running")
+	var existingRent Rent
+	if err := tx.First(&existingRent, rentDetail.RentID).Error; err != nil {
 		return err
 	}
 
-	var post Post
-	if err := tx.First(&post, rent.PostID).Error; err != nil {
+	var existingPost Post
+	if err := tx.First(&existingPost, existingRent.PostID).Error; err != nil {
 		return err
 	}
 
-	if rentDetail.Status == "OnProgress" {
-		rent.Readonly = true
+	if rentDetail.Status == "OnProgress" || rentDetail.Status == "Done" || rentDetail.Status == "Declined" {
+		*existingRent.Readonly = true // Assuming Readonly is not a pointer
 	}
 
 	if rentDetail.Status == "Done" || rentDetail.Status == "Declined" {
-		rent.Readonly = true
-		*post.Available = true
+		*existingPost.Available = true // Assuming Available is not a pointer
 	}
 
-	if err := tx.Save(&rent).Error; err != nil {
+	if err := tx.Save(&existingPost).Error; err != nil {
 		return err
 	}
 
-	if err := tx.Save(&post).Error; err != nil {
+	if err := tx.Save(&existingRent).Error; err != nil {
 		return err
 	}
 

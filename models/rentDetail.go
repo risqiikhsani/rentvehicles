@@ -10,7 +10,6 @@ import (
 
 type RentDetail struct {
 	gorm.Model
-	LicensePlate         string     `json:"license_plate" form:"license_plate"`
 	PickupDate           *time.Time `json:"pickup_date" form:"pickup_date" validate:"omitempty,gtefield=StartDate,ltefield=EndDate"`
 	ReturnDate           *time.Time `json:"return_date" form:"return_date" validate:"omitempty,gtefield=PickupDate,ltefield=EndDate"`
 	IsPaid               bool       `json:"is_paid" form:"is_paid" gorm:"default:false"`

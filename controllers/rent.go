@@ -12,11 +12,6 @@ import (
 )
 
 func GetEstimateRentPrice(c *gin.Context) {
-	// Check if the user is authenticated
-	_, _, authenticated := handlers.RequireAuthentication(c, "")
-	if !authenticated {
-		return
-	}
 
 	// Get the parameters from the request
 	postIDstr := c.Query("post_id")

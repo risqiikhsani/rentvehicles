@@ -58,7 +58,20 @@ func main() {
 
 	// CORS middleware to allow requests from localhost:3000 (Next.js development)
 	r.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		// List of allowed origins (add your URLs here)
+		allowedOrigins := []string{
+			"http://localhost:3000",
+			"http://192.168.1.3:3000",
+			// Add more URLs as needed
+		}
+
+		origin := c.GetHeader("Origin")
+		for _, allowedOrigin := range allowedOrigins {
+			if allowedOrigin == origin {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+				break
+			}
+		}
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS") // Include DELETE here
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")

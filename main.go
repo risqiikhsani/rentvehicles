@@ -11,6 +11,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
 	"github.com/risqiikhsani/rentvehicles/utils"
+	"github.com/risqiikhsani/rentvehicles/websocket"
 	// "github.com/spf13/viper"
 )
 
@@ -107,6 +108,7 @@ func main() {
 	routes.SetupCatRoutes(public, dbInstance)
 	routes.SetupRentRoutes(public)
 	routes.SetupRentDetailRoutes(public)
+	r.GET("/websocket", websocket.Ws)
 
 	addr := fmt.Sprintf(":%s", serverPort)
 

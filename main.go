@@ -108,7 +108,10 @@ func main() {
 	routes.SetupCatRoutes(public, dbInstance)
 	routes.SetupRentRoutes(public)
 	routes.SetupRentDetailRoutes(public)
-	r.GET("/websocket", websocket.Ws)
+	// r.GET("/websocket", websocket.Ws)
+	r.GET("/websocket", func(c *gin.Context) {
+		websocket.ServeWs(c.Writer, c.Request)
+	})
 
 	addr := fmt.Sprintf(":%s", serverPort)
 

@@ -10,6 +10,7 @@ import (
 	"github.com/risqiikhsani/rentvehicles/middlewares"
 	"github.com/risqiikhsani/rentvehicles/models"
 	"github.com/risqiikhsani/rentvehicles/routes"
+	socket "github.com/risqiikhsani/rentvehicles/socketio"
 	"github.com/risqiikhsani/rentvehicles/utils"
 	"github.com/risqiikhsani/rentvehicles/websocket"
 	// "github.com/spf13/viper"
@@ -109,9 +110,23 @@ func main() {
 	routes.SetupRentRoutes(public)
 	routes.SetupRentDetailRoutes(public)
 	// r.GET("/websocket", websocket.Ws)
-	r.GET("/websocket", func(c *gin.Context) {
-		websocket.ServeWs(c.Writer, c.Request)
+	// r.GET("/websocket", func(c *gin.Context) {
+	// 	websocket.ServeWs(c.Writer, c.Request)
+	// })
+
+	// go websocket.BroadcastMessages("Test")
+
+	sockets := r.Group("/socket")
+
+	var hub = websocket.NewHub() // create new instance of hub
+	go hub.Run()                 // starting go routine
+
+	// define end point where websocket is
+	sockets.GET("/websocket", func(c *gin.Context) {
+		websocket.ServeWs(hub, c.Writer, c.Request)
 	})
+
+	socket.InitializeSocketIO(sockets)
 
 	addr := fmt.Sprintf(":%s", serverPort)
 

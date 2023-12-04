@@ -314,7 +314,7 @@ func ForgotPassword(c *gin.Context) {
 	encodedToken := url.QueryEscape(resetToken)
 
 	// Construct the reset password link by appending the encoded token to the URL
-	resetPasswordURL := "http://localhost:8080/api/forgot-password/?token=" + encodedToken
+	resetPasswordURL := "http://localhost:3000/auth/forgot-password/?token=" + encodedToken
 
 	// Send an email to the user with the resetPasswordURL
 	secretConf := configs.GetSecretConfig()

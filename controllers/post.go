@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/risqiikhsani/rentvehicles/handlers"
@@ -13,7 +14,16 @@ import (
 // Implement other route handlers similarly
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
-	if err := models.DB.Preload(clause.Associations).Find(&posts).Error; err != nil {
+	searchQuery := c.Query("search") // Assuming a single search query parameter
+
+	query := models.DB.Preload(clause.Associations)
+
+	// If a search query is provided, filter the posts based on brand or brand_model
+	if searchQuery != "" {
+		query = query.Where("LOWER(brand) LIKE ? OR LOWER(brand_model) LIKE ?", "%"+strings.ToLower(searchQuery)+"%", "%"+strings.ToLower(searchQuery)+"%")
+	}
+
+	if err := query.Find(&posts).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No posts found"})
 		return
 	}

@@ -1,0 +1,17 @@
+export
+
+docker exec -it postgres_go2 bash
+pg_dump -U <username> -d <database_name> > /tmp/backup.sql
+docker cp postgres_go2:/tmp/backup.sql ./backup.sql
+
+export without entering container
+
+docker exec -i postgres_go2 pg_dump -U <username> -d <database_name> > backup.sql
+
+
+import
+
+docker compose up -d
+docker cp mybackup.sql postgres_go2:/tmp/db.sql
+docker exec -it postgres_go2 bash
+psql -U <username> -d <database_name> -f /tmp/db.sql

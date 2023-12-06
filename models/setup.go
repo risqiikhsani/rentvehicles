@@ -92,6 +92,9 @@ func ConnectDB(secretConf configs.SecretsConfig) (*MyDatabase, error) {
 	if err := autoMigrateModel(db, &ForgotPassword{}); err != nil {
 		log.Fatalf("Error migrating ForgotPassword: %v", err)
 	}
+	if err := autoMigrateModel(db, &Favorite{}); err != nil {
+		log.Fatalf("Error migrating Favorite: %v", err)
+	}
 
 	fmt.Println("Connected to PostgreSQL database")
 

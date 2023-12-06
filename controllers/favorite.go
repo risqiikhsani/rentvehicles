@@ -32,6 +32,12 @@ func CreateFavorite(c *gin.Context) {
 		return
 	}
 
+	var existingPost models.Post
+	if err := models.DB.Where("id = ?", uintVal).First(&existingPost).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
 	var favorite models.Favorite
 
 	favorite.UserID = userID
@@ -59,9 +65,23 @@ func DeleteFavoriteById(c *gin.Context) {
 		return
 	}
 
+	// if post is not found , error
+	var existingPost models.Post
+	if err := models.DB.Where("id = ?", uintVal).First(&existingPost).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	// if favorite is not found, error
 	var favorite models.Favorite
 	if err := models.DB.Where("user_id = ? AND post_id = ?", userID, uintVal).First(&favorite).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Favorite not found"})
+		return
+	}
+
+	// if user is not the favorite creator, error
+	if favorite.UserID != userID {
+		c.JSON(403, gin.H{"error": "Not authorized to delete this post"})
 		return
 	}
 

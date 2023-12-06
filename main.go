@@ -105,6 +105,7 @@ func main() {
 	routes.SetupUserRoutes(public)
 	routes.SetupMeRoutes(public)
 	routes.SetupPostRoutes(public)
+	routes.SetupFavoriteRoutes(public)
 	routes.SetupLocationRoutes(public)
 	routes.SetupCatRoutes(public, dbInstance)
 	routes.SetupRentRoutes(public)

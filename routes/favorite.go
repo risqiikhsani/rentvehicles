@@ -7,12 +7,13 @@ import (
 )
 
 func SetupFavoriteRoutes(public *gin.RouterGroup) {
-	me := public.Group("/favorite")
-	me.Use(middlewares.AuthMiddleware())
-	me.Use(middlewares.LogMiddleware())
+	fav := public.Group("/favorites")
+	fav.Use(middlewares.AuthMiddleware())
+	fav.Use(middlewares.LogMiddleware())
 	{
-		me.GET("/", controllers.GetFavorites)
-		me.POST("/", controllers.CreateFavorite)
-		me.DELETE("/", controllers.DeleteFavoriteById)
+		fav.GET("", controllers.GetFavorites)
+		fav.GET("/posts", controllers.GetFavoritePosts)
+		fav.POST("", controllers.CreateFavorite)
+		fav.DELETE("", controllers.DeleteFavoriteById)
 	}
 }

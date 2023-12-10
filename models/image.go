@@ -30,6 +30,7 @@ func SetStaticImagePath(path string) {
 }
 
 func (i Image) GetClickableURL() string {
+
 	// Construct the full image URL by appending the path to the base URL
 	return fmt.Sprintf("%s/%s/%s", baseURL, staticImagePath, filepath.Base(i.Path))
 }

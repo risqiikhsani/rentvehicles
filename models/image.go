@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -32,9 +33,12 @@ func SetStaticImagePath(path string) {
 func (i Image) GetClickableURL() string {
 
 	// Construct the full image URL by appending the path to the base URL
-	cleanPath := filepath.Clean(i.Path)
+
+	// for windows!
+	cleanedPath := strings.Replace(i.Path, "\\", "/", -1)
+
 	// return fmt.Sprintf("%s/%s/%s", baseURL, staticImagePath, filepath.Base(cleanPath))
-	return fmt.Sprintf("%s/%s/%s", baseURL, staticImagePath, filepath.Base(cleanPath))
+	return fmt.Sprintf("%s/%s/%s", baseURL, staticImagePath, filepath.Base(cleanedPath))
 }
 
 // https://pkg.go.dev/encoding/json

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,10 +29,30 @@ func InitializeLogging(logFilePath string) {
 	log.Logger = zerolog.New(multi).With().Timestamp().Logger()
 }
 
+// func createLogFile(logFilePath string) *os.File {
+// 	f, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+// 	if err != nil {
+// 		log.Fatal().Err(err).Msg("error opening file")
+// 	}
+// 	return f
+// }
+
 func createLogFile(logFilePath string) *os.File {
+	// Get the directory path
+	dir := filepath.Dir(logFilePath)
+
+	// Create the directory if it doesn't exist
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			log.Fatal().Err(err).Msg("error creating directory")
+		}
+	}
+
+	// Open or create the log file
 	f, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatal().Err(err).Msg("error opening file")
+		log.Fatal().Err(err).Msg("error opening/creating file")
 	}
 	return f
 }

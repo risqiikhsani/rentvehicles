@@ -5,7 +5,7 @@ production:
   debug_mode: false
 
 server_port: 8080
-log_file: gin.log
+log_file: logs/app.log
 feature_enabled: true
 max_items_per_page: 50
 static_path: static

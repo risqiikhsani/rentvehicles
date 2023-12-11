@@ -131,7 +131,7 @@ func RegisterAdmin(c *gin.Context) {
 	usr := models.User{
 		PublicUsername: publicUsername,
 		AccountID:      acc.ID, // Assuming AccountID is of uint type
-		Role:           "admin",
+		Role:           "Admin",
 	}
 	models.DB.Create(&usr)
 

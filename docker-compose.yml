@@ -12,7 +12,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-
   go_app:
     build: .
     container_name: go_app_container
@@ -22,6 +21,8 @@ services:
       - postgres
     env_file:
       - ./.env
+    volumes:
+      - uploaded_files:/app/static
 
   nginx:
     image: nginx:latest
@@ -46,3 +47,4 @@ services:
 
 volumes:
   postgres_data:
+  uploaded_files:

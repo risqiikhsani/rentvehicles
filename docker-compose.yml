@@ -23,6 +23,7 @@ services:
       - ./.env
     volumes:
       - uploaded_files:/app/static
+      - log_files:/app/logs
 
   nginx:
     image: nginx:latest
@@ -48,3 +49,4 @@ services:
 volumes:
   postgres_data:
   uploaded_files:
+  log_files:

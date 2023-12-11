@@ -14,13 +14,39 @@ import (
 // Implement other route handlers similarly
 func GetPosts(c *gin.Context) {
 	var posts []models.Post
-	searchQuery := c.Query("search") // Assuming a single search query parameter
+	searchQuery := c.Query("search")        // Assuming a single search query parameter
+	sortBy := c.DefaultQuery("sort", "")    // Sort by a specific field (e.g., price, creation_time)
+	order := c.DefaultQuery("order", "asc") // Order: asc (default) or desc
 
 	query := models.DB.Preload(clause.Associations)
 
 	// If a search query is provided, filter the posts based on brand or brand_model
 	if searchQuery != "" {
 		query = query.Where("LOWER(brand) LIKE ? OR LOWER(brand_model) LIKE ?", "%"+strings.ToLower(searchQuery)+"%", "%"+strings.ToLower(searchQuery)+"%")
+	}
+
+	// Filter based on brand
+	brand := c.Query("brand")
+	if brand != "" {
+		query = query.Where("LOWER(brand) = ?", strings.ToLower(brand))
+	}
+
+	// Filter based on transmission
+	transmission := c.Query("transmission")
+	if transmission != "" {
+		query = query.Where("LOWER(transmission) = ?", strings.ToLower(transmission))
+	}
+
+	// Filter based on fuel type
+	fuelType := c.Query("fuel_type")
+	if fuelType != "" {
+		query = query.Where("LOWER(fuel_type) = ?", strings.ToLower(fuelType))
+	}
+
+	// Sort the posts based on the specified field and order
+	if sortBy != "" {
+		orderClause := sortBy + " " + strings.ToUpper(order)
+		query = query.Order(orderClause)
 	}
 
 	if err := query.Find(&posts).Error; err != nil {

@@ -12,16 +12,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-
-  # go_app:
-  #   build: .
-  #   container_name: go_app_container
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - postgres
-  #   env_file:
-  #     - ./.env
+  go_app:
+    build: .
+    container_name: go_app_container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    env_file:
+      - ./.env
+    volumes:
+      - uploaded_files:/app/static
+      - log_files:/app/logs
 
   # nginx:
   #   image: nginx:latest
@@ -46,3 +48,5 @@ services:
 
 volumes:
   postgres_data:
+  uploaded_files:
+  log_files:

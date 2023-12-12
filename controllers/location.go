@@ -18,7 +18,7 @@ func GetLocations(c *gin.Context) {
 func GetLocationById(c *gin.Context) {
 	locationId := c.Param("location_id")
 	var location models.Location
-	result := models.DB.Preload("Posts").First(&location, locationId)
+	result := models.DB.First(&location, locationId)
 
 	if result.Error != nil {
 		c.JSON(404, gin.H{"error": "Location not found"})

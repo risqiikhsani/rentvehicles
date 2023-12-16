@@ -23,3 +23,6 @@ commit a
 commit b
 commit c
 
+changed
+
+something

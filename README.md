@@ -14,3 +14,5 @@ commit 2
 commit a
 commit b
 commit c
+
+commit a

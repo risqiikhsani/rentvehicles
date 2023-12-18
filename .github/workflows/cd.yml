@@ -1,0 +1,27 @@
+name: Deploy to DigitalOcean Droplet (Prod)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+      - name: Connect to Droplet and Reset Main Branch
+        run: |
+          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /projects/rentvehicles && git checkout main && git fetch origin && git reset --hard origin/main'
+
+      - name: Connect to Droplet and Rebuild Docker Compose Services
+        run: |
+          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /projects/rentvehicles && docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml up -d --build'

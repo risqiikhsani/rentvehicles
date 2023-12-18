@@ -20,8 +20,8 @@ jobs:
           
       - name: Connect to Droplet and Reset Main Branch
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
+          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
 
       - name: Connect to Droplet and Rebuild & Rerun Docker Compose Services
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'
+          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'

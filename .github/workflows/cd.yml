@@ -18,6 +18,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+        # to prevent host key verification failed
+    #   - name: Configure SSH known hosts
+    #     run: ssh-keyscan -H ${{ secrets.DROPLET_IP_ADDRESS }} >> ~/.ssh/known_hosts
+        
       - name: Test SSH connection to Droplet
         run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} exit
 

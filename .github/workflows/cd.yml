@@ -17,10 +17,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    
-      - name: configure SSH known hosts
-        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           
+      - name: Test SSH connection to Droplet
+        run: ssh root@${{ secrets.DROPLET_IP_ADDRESS }} exit
+
       - name: Connect to Droplet -> Reset Main Branch
         run: |
           ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'

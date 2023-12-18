@@ -25,9 +25,16 @@ jobs:
       - name: Test SSH connection to Droplet
         run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} exit
 
-      - name: Connect to Droplet -> Reset Main Branch
+
+          # this will make SSL certificate from certbot gone , dont hard reset
+      # - name: Connect to Droplet -> Reset Main Branch
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
+
+      - name: Connect to Droplet -> Pull Main Branch
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git pull origin main'
+
 
       - name: Connect to Droplet -> Rebuild & Rerun Docker Compose Services
         run: |

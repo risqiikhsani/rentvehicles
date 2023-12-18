@@ -22,20 +22,30 @@ jobs:
     #   - name: Configure SSH known hosts
     #     run: ssh-keyscan -H ${{ secrets.DROPLET_IP_ADDRESS }} >> ~/.ssh/known_hosts
         
-      - name: Test SSH connection to Droplet
-        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} exit
 
-
-          # this will make SSL certificate from certbot gone , dont hard reset
+          # this will make SSL certificate from certbot gone , dont hard reset 
       # - name: Connect to Droplet -> Reset Main Branch
       #   run: |
       #     ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
 
-      - name: Connect to Droplet -> Pull Main Branch
-        run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git pull origin main'
+      - name: Test SSH connection to Droplet
+        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} exit
 
+      - name: Create Backup Directory for Certbot
+        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'mkdir -p /root/projects/backup/certbot'
+
+      - name: Backup Certbot SSL Certificates
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cp -R /root/projects/rentvehicles/certbot/* /root/projects/backup/certbot/'
+
+      - name: Connect to Droplet -> Reset Main Branch
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
+
+      - name: Connect to Droplet -> Recover Deleted Certbot SSL Certificates By Hard Reset
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cp -R /root/projects/backup/certbot/* /root/projects/rentvehicles/certbot/'
 
       - name: Connect to Droplet -> Rebuild & Rerun Docker Compose Services
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml up -d --build'

@@ -24,4 +24,4 @@ jobs:
 
       - name: Connect to Droplet and Rebuild & Rerun Docker Compose Services
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml up -d --build'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'

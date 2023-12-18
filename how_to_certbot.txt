@@ -1,0 +1,85 @@
+https://mindsers.blog/en/post/https-using-nginx-certbot-docker/
+
+
+OTHERS :
+https://www.programonaut.com/setup-ssl-with-docker-nginx-and-lets-encrypt/
+https://www.agiksetiawan.com/posts/how-to-setup-nginx-free-ssl-using-lets-encrypt-with-certbot-in-docker/https://www.agiksetiawan.com/posts/how-to-setup-nginx-free-ssl-using-lets-encrypt-with-certbot-in-docker/
+
+
+STEP = 
+
+1. NGINX CONF = 
+
+server {
+    listen 80;
+	listen [::]:80;
+    server_name rentvehicles-server.switzcool.cloud www.rentvehicles-server.switzcool.cloud;
+	server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://rentvehicles-server.switzcool.cloud$request_uri;
+    }
+}
+
+2. and then run this command
+
+docker compose -f docker-compose-prod.yml run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ --dry-run -d rentvehicles-server.switzcool.cloud
+
+docker compose -f docker-compose-prod.yml run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d rentvehicles-server.switzcool.cloud
+
+3. and then add this to nginx conf =
+
+server {
+    listen 80;
+	listen [::]:80;
+    server_name rentvehicles-server.switzcool.cloud www.rentvehicles-server.switzcool.cloud;
+	server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://rentvehicles-server.switzcool.cloud$request_uri;
+    }
+}
+
+
+server {
+    listen 443 default_server ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name rentvehicles-server.switzcool.cloud;
+
+    ssl_certificate /etc/nginx/ssl/live/rentvehicles-server.switzcool.cloud/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/rentvehicles-server.switzcool.cloud/privkey.pem;
+    
+    location / {
+        proxy_pass http://go_app:8080; # Assuming your Go backend is running on port 8080
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
+    # Serve static files directly
+    location /static/ {
+        proxy_pass http://go_app:8080/static/;
+        # alias /static/; # Path to your static files within the Go app container
+    }
+
+    # Handle specific image file requests
+    location /static/images/ {
+        proxy_pass http://go_app:8080/static/images/;
+        # alias /static/images/; # Path to your images within the Go app container
+    }
+}
+
+4. and then restart nginx or rebuild nginx container.
+
+
+
+to renew ssl ssl certificate
+docker compose run --rm certbot renew

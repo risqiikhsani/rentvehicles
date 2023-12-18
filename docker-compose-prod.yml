@@ -42,12 +42,9 @@ services:
 
   certbot:
     image: certbot/certbot:latest
-    command: certonly --webroot -w /var/www/certbot --email ${EMAIL} -d ${DOMAIN} --agree-tos
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
-    depends_on:
-      - nginx
 
 volumes:
   postgres_data:

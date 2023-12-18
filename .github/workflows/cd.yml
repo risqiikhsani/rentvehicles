@@ -17,14 +17,14 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
+
       - name: Test SSH connection to Droplet
-        run: ssh root@${{ secrets.DROPLET_IP_ADDRESS }} exit
+        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} exit
 
       - name: Connect to Droplet -> Reset Main Branch
         run: |
-          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && git reset --hard HEAD && git checkout main && git fetch origin && git reset --hard origin/main'
 
       - name: Connect to Droplet -> Rebuild & Rerun Docker Compose Services
         run: |
-          ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /root/projects/rentvehicles && docker compose -f docker-compose-prod.yml down && docker compose -f docker-compose-prod.yml up -d --build'

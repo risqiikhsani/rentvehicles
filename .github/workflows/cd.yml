@@ -22,6 +22,6 @@ jobs:
         run: |
           ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /projects/rentvehicles && git checkout main && git fetch origin && git reset --hard origin/main'
 
-      - name: Connect to Droplet and Rebuild and Rerun Docker Compose Services
+      - name: Connect to Droplet and Rebuild & Rerun Docker Compose Services
         run: |
           ssh root@${{ secrets.DROPLET_IP_ADDRESS }} 'cd /projects/rentvehicles && docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml up -d --build'

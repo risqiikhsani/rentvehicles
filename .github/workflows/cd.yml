@@ -17,6 +17,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+      - name: configure SSH known hosts
+        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           
       - name: Connect to Droplet -> Reset Main Branch
         run: |

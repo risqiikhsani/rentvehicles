@@ -1,0 +1,38 @@
+File: websocket.go
+
+    Imports: Imports necessary packages for handling WebSocket connections and logs.
+
+    Constants:
+        Defines various constants like timeouts, message sizes, etc., used in the WebSocket connections.
+
+    Client struct:
+        Represents a WebSocket client.
+        Contains a reference to the WebSocket connection, a channel for sending messages, and a reference to the hub (central coordinator).
+
+    ReadPump() function:
+        Handles incoming messages from the client.
+        Sets up read limits, deadlines, and processes received messages.
+        Cleans up resources when the connection is closed.
+
+    WritePump() function:
+        Manages outgoing messages to clients.
+        Handles message sending, ping-pong for connection health checks, and closing connections.
+
+    ServeWs() function:
+        Upgrades the HTTP connection to a WebSocket connection.
+        Creates a new Client instance, registers it with the Hub, and starts separate goroutines for reading and writing messages.
+
+File: hub.go
+
+    Hub struct:
+        Represents a central hub for managing connected clients.
+        Maintains a map of connected clients, channels for broadcasting messages, registering, and unregistering clients.
+
+    NewHub() function:
+        Initializes a new instance of the Hub.
+
+    Run() method:
+        Runs an infinite loop managing the hub's operations.
+        Handles client registration, unregistration, and broadcasting messages to connected clients.
+
+This code defines the logic for managing WebSocket connections, client registration, message handling, and broadcasting within a chat server. The Hub keeps track of connected clients and handles the sending and receiving of messages between them. The Client handles the actual WebSocket connection and message pumps (read and write).

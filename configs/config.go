@@ -16,6 +16,7 @@ type SecretsConfig struct {
 	EmailSenderName     string `mapstructure:"EMAIL_SENDER_NAME"`
 	EmailSenderAddress  string `mapstructure:"EMAIL_SENDER_ADDRESS"`
 	EmailSenderPassword string `mapstructure:"EMAIL_SENDER_PASSWORD"`
+	MidtransServerKey   string `mapstructure:"MIDTRANS_SERVER_KEY"`
 }
 
 type MainConfig struct {

@@ -113,6 +113,7 @@ func main() {
 	routes.SetupCatRoutes(public, dbInstance)
 	routes.SetupRentRoutes(public)
 	routes.SetupRentDetailRoutes(public)
+	routes.SetupPaymentRoutes(public)
 	// r.GET("/websocket", websocket.Ws)
 	// r.GET("/websocket", func(c *gin.Context) {
 	// 	websocket.ServeWs(c.Writer, c.Request)

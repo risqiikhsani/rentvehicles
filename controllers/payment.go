@@ -22,6 +22,11 @@ func CreatePayment(c *gin.Context) {
 
 	rent_id := c.Param("rent_id")
 
+	if rent_id == "" {
+		c.JSON(404, gin.H{"error": "rent_id is required"})
+		return
+	}
+
 	var rent models.Rent
 
 	result := models.DB.Preload(clause.Associations).First(&rent, rent_id)
@@ -37,7 +42,8 @@ func CreatePayment(c *gin.Context) {
 
 	var rent_id_string string = strconv.FormatUint(uint64(rent.ID), 10)
 
-	data, err := SendPaymentRequest(rent_id_string, rent.RentDetail.EstimatedFinalPrice)
+	// data, err := SendPaymentRequest(rent_id_string, rent.RentDetail.EstimatedFinalPrice)
+	data, err := SendPaymentRequest(rent_id_string, 10000)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send payment request"})
 		return
